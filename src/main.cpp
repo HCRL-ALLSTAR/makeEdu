@@ -3,11 +3,24 @@
 
 HCRL_Edu hcrl;
 
+#define PUB_LIGHT_1 "M5/light1"
+#define PUB_LIGHT_2 "M5/light2"
+#define PUB_LIGHT_3 "M5/light3"
+#define PUB_AIR "M5/air"
+#define PUB_FAN "M5/fan"
+#define PUB_ENV "M5/env"
+#define PUB_PIR "M5/pir"
+
+#define SUB_LIGHT_1 "Node/light1"
+#define SUB_LIGHT_2 "Node/light2"
+#define SUB_LIGHT_3 "Node/light3"
+#define SUB_AIR "Node/air"
+#define SUB_FAN "Node/fan"
+
 //Make Json
 void SubLight();
 void SubAir();
 void SubFan();
-
 void PubENV();
 void PubPIR();
 void PubLight(const char *lightTopic);
