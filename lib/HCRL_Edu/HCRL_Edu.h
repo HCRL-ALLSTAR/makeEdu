@@ -61,6 +61,7 @@
 #include "System/SystemDefaults.hpp"
 #include "System/SystemMacros.hpp"
 #include "Baterry/baterry.h"
+#include "jsonwrapper/jsonwrapper.hpp"
 class HCRL_Edu
 {
 private:
@@ -101,6 +102,11 @@ public:
     Access to wifi connection methods
     */
     WiFiTask WiFi;
+
+    /* 
+    Access to JSON Method
+    */
+    json JSON;
 
     void update();
 };
