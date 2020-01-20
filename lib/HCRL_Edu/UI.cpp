@@ -21,7 +21,7 @@ void UI::updateCode(void *pv)
 //init UI
 void UI::begin(bool LCDEnable, bool SDEnable, bool SerialEnable)
 {
-  xTaskCreate(updateCode, "Ui update task", 4096, this, 10, &updateHandle);
+  //xTaskCreate(updateCode, "Ui update task", 4096, this, 10, &updateHandle);
   // Correct init once
   if (isInited == true)
   {

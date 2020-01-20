@@ -92,7 +92,7 @@ class UI
 public:
   UI();
   void begin(bool LCDEnable = true, bool SDEnable = true, bool SerialEnable = true);
-
+  void update();
   void setBrightness(uint8_t brightness);
   void main();
 // Button API
@@ -251,7 +251,6 @@ private:
   //
   TaskHandle_t updateHandle;
   static void updateCode(void *);
-  void update();
 };
 #else
 #error “This library only supports boards with ESP32 processor.”

@@ -61,6 +61,7 @@
 #include "System/SystemDefaults.hpp"
 #include "System/SystemMacros.hpp"
 #include "Baterry/baterry.h"
+#include "jsonwrapper/jsonwrapper.hpp"
 class HCRL_Edu
 {
 private:
@@ -102,6 +103,11 @@ public:
     */
     WiFiTask WiFi;
 
+    /* 
+    Access to JSON Method
+    */
+    json JSON;
+
     void update();
 };
 
@@ -126,7 +132,7 @@ void HCRL_Edu::update()
     Ui.humid_set(ENV.getHumi());
     Ui.pa_set(ENV.getPressure());
     Ui.motion_set(Motion.getValue());
-
+    Ui.update();
     TaskDelay(delay_Time);
 }
 
