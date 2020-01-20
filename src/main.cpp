@@ -20,7 +20,7 @@ HCRL_Edu hcrl;
 
 #define KEY_TEMP "temp"
 #define KEY_HUMI "humi"
-#define KEY_PRESSURE "pressure"
+#define KEY_PRESSURE "pres"
 #define KEY_STATUS "st"
 #define KEY_LEVEL "lv"
 #define KEY_R "R"
@@ -28,9 +28,9 @@ HCRL_Edu hcrl;
 #define KEY_B "B"
 
 //Make Json
-void SubLight();
-void SubAir();
-void SubFan();
+void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus);
+void SubAir(byte *payload, unsigned int length);
+void SubFan(byte *payload, unsigned int length);
 void PubENV(const char *topic);
 void PubPIR(const char *topic);
 void PubLight(const char *topic, uint8_t lightStatu);
@@ -45,19 +45,26 @@ uint8_t motionStatus;
 uint8_t light_1Status;
 uint8_t light_2Status;
 uint8_t light_3Status;
+
 uint8_t airStatus;
 uint8_t airTemp;
 uint8_t fanStatus;
 uint8_t fanLevel;
 
 millisDelay pubDelay;
+
 void setup(void)
 {
 	//Serial.begin(115200);
 	hcrl.Ui.begin();
 	hcrl.WiFi.Begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
 	hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
-	hcrl.MQTT.startSubscribe("/test");
+	hcrl.MQTT.startSubscribe(SUB_AIR);
+	hcrl.MQTT.startSubscribe(SUB_FAN);
+	hcrl.MQTT.startSubscribe(SUB_LIGHT_1);
+	hcrl.MQTT.startSubscribe(SUB_LIGHT_2);
+	hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
+
 	hcrl.Ui.node_init(5);
 	for (int i = 0; i < 5; i++)
 	{
@@ -83,8 +90,7 @@ void setup(void)
 
 	hcrl.ENV.begin();
 	hcrl.Motion.begin();
-	pubDelay.start(Sec2MS(4));
-	Sprintln(Sec2MS(3));
+	pubDelay.start(Sec2MS(1));
 }
 void loop(void)
 {
@@ -125,6 +131,26 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
 	Paylaod[Length] = '\0';
 	String topic_str = Topic, payload_str = (char *)Paylaod;
 	Serial.println("[" + topic_str + "]: " + payload_str);
+	if (topic_str.equals(SUB_LIGHT_1))
+	{
+		SubLight(Paylaod, Length, &light_1Status);
+	}
+	else if (topic_str.equals(SUB_LIGHT_2))
+	{
+		SubLight(Paylaod, Length, &light_2Status);
+	}
+	else if (topic_str.equals(SUB_LIGHT_3))
+	{
+		SubLight(Paylaod, Length, &light_3Status);
+	}
+	else if (topic_str.equals(SUB_AIR))
+	{
+		SubAir(Paylaod, Length);
+	}
+	else if (topic_str.equals(SUB_FAN))
+	{
+		SubFan(Paylaod, Length);
+	}
 }
 
 /*
@@ -135,8 +161,11 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
     "B": number		--> Blue
 }
 */
-void SubLight()
+void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus)
 {
+	StaticJsonDocument<1024> doc;
+	deserializeJson(doc, payload, length);
+	*lightStatus = doc[KEY_STATUS];
 }
 
 /*
@@ -145,8 +174,12 @@ void SubLight()
     "temp" : number	--> Target temperature
 }
 */
-void SubAir()
+void SubAir(byte *payload, unsigned int length)
 {
+	StaticJsonDocument<1024> doc;
+	deserializeJson(doc, payload, length);
+	airStatus = doc[KEY_STATUS];
+	airTemp = doc[KEY_TEMP];
 }
 
 /*
@@ -155,8 +188,12 @@ void SubAir()
     "level": number	--> Fan level
 }
 */
-void SubFan()
+void SubFan(byte *payload, unsigned int length)
 {
+	StaticJsonDocument<1024> doc;
+	deserializeJson(doc, payload, length);
+	fanStatus = doc[KEY_STATUS];
+	fanLevel = doc[KEY_LEVEL];
 }
 
 /*
@@ -241,7 +278,7 @@ void PubFan(const char *topic)
 	DynamicJsonDocument docJson(size);
 	char json[1024];
 	docJson[KEY_STATUS] = fanStatus;
-	docJson[KEY_TEMP] = fanLevel;
+	docJson[KEY_LEVEL] = fanLevel;
 	serializeJson(docJson, json);
 	//Sprintln(String(topic) + " : " + String(json));
 	hcrl.MQTT.publish(topic, json);
