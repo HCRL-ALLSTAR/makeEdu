@@ -126,7 +126,7 @@ void HCRL_Edu::update()
     Ui.humid_set(ENV.getHumi());
     Ui.pa_set(ENV.getPressure());
     Ui.motion_set(Motion.getValue());
-
+    Ui.update();
     TaskDelay(delay_Time);
 }
 
