@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <HCRL_Edu.h>
-
+#include "jsonwrapper/ArduinoJson.h"
+#include "millisDelay.h"
 HCRL_Edu hcrl;
 
 #define PUB_LIGHT_1 "M5/light1"
@@ -17,17 +18,39 @@ HCRL_Edu hcrl;
 #define SUB_AIR "Node/air"
 #define SUB_FAN "Node/fan"
 
+#define KEY_TEMP "temp"
+#define KEY_HUMI "humi"
+#define KEY_PRESSURE "pressure"
+#define KEY_STATUS "st"
+#define KEY_LEVEL "lv"
+#define KEY_R "R"
+#define KEY_G "G"
+#define KEY_B "B"
+
 //Make Json
 void SubLight();
 void SubAir();
 void SubFan();
-void PubENV();
-void PubPIR();
-void PubLight(const char *lightTopic);
-void PubAir();
-void PubFan();
+void PubENV(const char *topic);
+void PubPIR(const char *topic);
+void PubLight(const char *topic, uint8_t lightStatu);
+void PubAir(const char *topic);
+void PubFan(const char *topic);
 void callback(char *Topic, byte *Paylaod, unsigned int Length);
 
+float temp;
+float humi;
+float pressure;
+uint8_t motionStatus;
+uint8_t light_1Status;
+uint8_t light_2Status;
+uint8_t light_3Status;
+uint8_t airStatus;
+uint8_t airTemp;
+uint8_t fanStatus;
+uint8_t fanLevel;
+
+millisDelay pubDelay;
 void setup(void)
 {
 	//Serial.begin(115200);
@@ -57,10 +80,43 @@ void setup(void)
 	hcrl.Ui.node_setType(2, LIGHT);
 	hcrl.Ui.node_setTitle(2, "LIGHT", "Overall");
 	hcrl.Ui.node_setTitlePic(2, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+
+	hcrl.ENV.begin();
+	hcrl.Motion.begin();
+	pubDelay.start(Sec2MS(4));
+	Sprintln(Sec2MS(3));
 }
 void loop(void)
 {
-	hcrl.MQTT.publish("/testPub", "Hello From M5");
+	//Random And Get Value
+	temp = hcrl.ENV.getTemp();
+	humi = hcrl.ENV.getHumi();
+	pressure = hcrl.ENV.getPressure();
+	motionStatus = hcrl.Motion.getValue();
+	light_1Status = random(0, 2);
+	light_2Status = random(0, 2);
+	light_3Status = random(0, 2);
+	airStatus = random(0, 2);
+	airTemp = random(25, 34);
+	fanStatus = random(0, 2);
+	fanLevel = random(1, 4);
+
+	//Pub Data to Server
+
+	if (pubDelay.justFinished())
+	{
+		PubAir(PUB_AIR);
+		PubENV(PUB_ENV);
+		PubFan(PUB_FAN);
+		PubPIR(PUB_PIR);
+		PubLight(PUB_LIGHT_1, light_1Status);
+		PubLight(PUB_LIGHT_2, light_2Status);
+		PubLight(PUB_LIGHT_3, light_3Status);
+		pubDelay.repeat();
+	}
+
+	// Update Data
+	randomSeed(millis());
 	hcrl.update();
 }
 
@@ -110,8 +166,17 @@ void SubFan()
     "pressure":number	--> Current Pressure
 }
 */
-void PubENV()
+void PubENV(const char *topic)
 {
+	size_t size = 1024;
+	DynamicJsonDocument docJson(size);
+	char json[1024];
+	docJson[KEY_TEMP] = temp;
+	docJson[KEY_HUMI] = humi;
+	docJson[KEY_PRESSURE] = pressure;
+	serializeJson(docJson, json);
+	//Sprintln(String(topic) + " : " + String(json));
+	hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -119,8 +184,15 @@ void PubENV()
     "st": boolean	--> Current Value of Motion Sensor
 }
 */
-void PubPIR()
+void PubPIR(const char *topic)
 {
+	size_t size = 1024;
+	DynamicJsonDocument docJson(size);
+	char json[1024];
+	docJson[KEY_STATUS] = motionStatus;
+	serializeJson(docJson, json);
+	//Sprintln(String(topic) + " : " + String(json));
+	hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -128,8 +200,15 @@ void PubPIR()
     "st": boolean	-->light status
 }
 */
-void PubLight(const char *lightTopic)
+void PubLight(const char *topic, uint8_t lightStatus)
 {
+	size_t size = 1024;
+	DynamicJsonDocument docJson(size);
+	char json[1024];
+	docJson[KEY_STATUS] = lightStatus;
+	serializeJson(docJson, json);
+	//Sprintln(String(topic) + " : " + String(json));
+	hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -138,8 +217,16 @@ void PubLight(const char *lightTopic)
     "temp" : number	--> Target temperature
 }
 */
-void PubAir()
+void PubAir(const char *topic)
 {
+	size_t size = 1024;
+	DynamicJsonDocument docJson(size);
+	char json[1024];
+	docJson[KEY_STATUS] = airStatus;
+	docJson[KEY_TEMP] = airTemp;
+	serializeJson(docJson, json);
+	//Sprintln(String(topic) + " : " + String(json));
+	hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -148,6 +235,14 @@ void PubAir()
     "level": number	--> Fan level
 }
 */
-void PubFan()
+void PubFan(const char *topic)
 {
+	size_t size = 1024;
+	DynamicJsonDocument docJson(size);
+	char json[1024];
+	docJson[KEY_STATUS] = fanStatus;
+	docJson[KEY_TEMP] = fanLevel;
+	serializeJson(docJson, json);
+	//Sprintln(String(topic) + " : " + String(json));
+	hcrl.MQTT.publish(topic, json);
 }
