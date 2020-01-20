@@ -2,12 +2,18 @@
 #include <HCRL_Edu.h>
 
 HCRL_Edu hcrl;
-void callback(char *Topic, byte *Paylaod, unsigned int Length)
-{
-	Paylaod[Length] = '\0';
-	String topic_str = Topic, payload_str = (char *)Paylaod;
-	Serial.println("[" + topic_str + "]: " + payload_str);
-}
+
+//Make Json
+void SubLight();
+void SubAir();
+void SubFan();
+
+void PubENV();
+void PubPIR();
+void PubLight(const char *lightTopic);
+void PubAir();
+void PubFan();
+void callback(char *Topic, byte *Paylaod, unsigned int Length);
 
 void setup(void)
 {
@@ -43,4 +49,92 @@ void loop(void)
 {
 	hcrl.MQTT.publish("/testPub", "Hello From M5");
 	hcrl.update();
+}
+
+void callback(char *Topic, byte *Paylaod, unsigned int Length)
+{
+	Paylaod[Length] = '\0';
+	String topic_str = Topic, payload_str = (char *)Paylaod;
+	Serial.println("[" + topic_str + "]: " + payload_str);
+}
+
+/*
+{
+    "st": boolean,  --> status of eachlight 
+    "R": number,	--> Red
+    "G": number,	--> Green
+    "B": number		--> Blue
+}
+*/
+void SubLight()
+{
+}
+
+/*
+{
+    "st": boolean,	--> Status of each air conditioner
+    "temp" : number	--> Target temperature
+}
+*/
+void SubAir()
+{
+}
+
+/*
+{
+    "st": boolean,	--> Status of each fan
+    "level": number	--> Fan level
+}
+*/
+void SubFan()
+{
+}
+
+/*
+{
+    "temp": number,		--> Current Temperature
+    "humi": number,		--> Curremt HUmidity
+    "pressure":number	--> Current Pressure
+}
+*/
+void PubENV()
+{
+}
+
+/*
+{
+    "st": boolean	--> Current Value of Motion Sensor
+}
+*/
+void PubPIR()
+{
+}
+
+/*
+{
+    "st": boolean	-->light status
+}
+*/
+void PubLight(const char *lightTopic)
+{
+}
+
+/*
+{
+    "st": boolean,	--> Status of each air conditioner
+    "temp" : number	--> Target temperature
+}
+*/
+void PubAir()
+{
+}
+
+/*
+{
+    "st": boolean,	--> Status of each fan
+    "level": number	--> Fan level
+}
+*/
+void PubFan()
+{
 }
