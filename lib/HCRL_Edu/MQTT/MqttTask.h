@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 #include <WiFiClient.h>
-#include <PubSubClient.h>
+#include "MqttWrapper/PubSubClient/PubSubClient.h"
 #include "System/SystemDefaults.hpp"
 #include "System/SystemMacros.hpp"
 #include "MqttWrapper/MqttWrapper.h"
