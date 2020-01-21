@@ -622,6 +622,7 @@ void UI::batteryUpdate()
 {
   Lcd.drawRoundRect(270, 8, 38, 17, 5, m.battFillColor);
   uint8_t currentLevel = batt.getLevel();
+  if(currentLevel > 100) currentLevel = 100;
   if (currentLevel <= 25)
   {
     this->m.battFillColor = m.lowBattFillColor;
