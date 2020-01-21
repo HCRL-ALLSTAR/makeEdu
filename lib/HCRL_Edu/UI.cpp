@@ -753,12 +753,12 @@ void UI::node_setAllTitleColor(uint16_t title_1st, uint16_t title_2nd)
 }
 
 //set wifi ssid
-void UI::wifi_ssid_set(char *ssid)
+void UI::set_wifi_ssid(char *ssid)
 {
   this->wifi_ssid = ssid;
 }
 //set wifi status
-void UI::wifi_status_set(bool status)
+void UI::set_wifi_status(bool status)
 {
   if (status)
     this->wifi_status = "Connected";
@@ -766,12 +766,12 @@ void UI::wifi_status_set(bool status)
     this->wifi_status = "Disconnected";
 }
 //set mqtt ip address
-void UI::mqtt_ip_set(char *ip)
+void UI::set_mqtt_ip(char *ip)
 {
   this->mqtt_ip = ip;
 }
 //set mqtt status
-void UI::mqtt_status_set(bool status)
+void UI::set_mqtt_status(bool status)
 {
   if (status)
     this->mqtt_status = "Connected";
@@ -779,22 +779,53 @@ void UI::mqtt_status_set(bool status)
     this->mqtt_status = "Disconnected";
 }
 //set temperature
-void UI::temp_set(float temp)
+void UI::set_temp(float temp)
 {
   this->temp = temp;
 }
 //set humidity
-void UI::humid_set(float humid)
+void UI::set_humid(float humid)
 {
   this->humid = humid;
 }
 //set pressure
-void UI::pa_set(float pressure)
+void UI::set_pa(float pressure)
 {
   this->pa = pressure;
 }
 //set pir value
-void UI::motion_set(int motion)
+void UI::set_motion(int motion)
 {
   this->motion = motion;
+}
+/*set control data at specific node
+FAN mode 0 - 3
+Others 0 - 1
+*/
+void UI::node_set_data(uint8_t index, uint8_t data)
+{
+  if(index < node_size){
+    this->node[index].data = data;
+  }
+}
+//set temp data for AIR mode at specific node
+void UI::node_set_temp_data(uint8_t index, int8_t temp)
+{
+  if(index < node_size){
+    this->node[index].temp_data = temp;
+  }
+}
+//get control data from specific node
+uint8_t UI::node_get_data(uint8_t index)
+{
+  if(index < node_size){
+    return node[index].data;
+  }
+}
+//get temp data from specific node
+int8_t UI::node_get_temp_data(uint8_t index)
+{
+  if(index < node_size){
+    return node[index].temp_data;
+  }
 }

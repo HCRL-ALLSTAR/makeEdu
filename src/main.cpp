@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include <HCRL_Edu.h>
-#include "jsonwrapper/ArduinoJson.h"
-#include "millisDelay.h"
+#include <millisDelay.h>
 HCRL_Edu hcrl;
 
 #define PUB_LIGHT_1 "M5/light1"

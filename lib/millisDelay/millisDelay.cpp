@@ -10,7 +10,7 @@
 
 // include Arduino.h for millis()
 #include <Arduino.h>
-#include <millisDelay.h>
+#include "millisDelay.h"
 
 millisDelay::millisDelay() {
   running = false; // not running on start

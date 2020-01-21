@@ -62,6 +62,8 @@
 #include "System/SystemMacros.hpp"
 #include "Baterry/baterry.h"
 #include "jsonwrapper/jsonwrapper.hpp"
+#include "jsonwrapper/ArduinoJson.h"
+
 class HCRL_Edu
 {
 private:
@@ -124,14 +126,14 @@ HCRL_Edu::~HCRL_Edu()
 for delay loop task and give other task running */
 void HCRL_Edu::update()
 {
-    Ui.wifi_ssid_set(WiFi.getSSID());
-    Ui.wifi_status_set(WiFi.getStatus());
-    Ui.mqtt_ip_set(MQTT.getServer());
-    Ui.mqtt_status_set(MQTT.getStatus());
-    Ui.temp_set(ENV.getTemp());
-    Ui.humid_set(ENV.getHumi());
-    Ui.pa_set(ENV.getPressure());
-    Ui.motion_set(Motion.getValue());
+    Ui.set_wifi_ssid(WiFi.getSSID());
+    Ui.set_wifi_status(WiFi.getStatus());
+    Ui.set_mqtt_ip(MQTT.getServer());
+    Ui.set_mqtt_status(MQTT.getStatus());
+    Ui.set_temp(ENV.getTemp());
+    Ui.set_humid(ENV.getHumi());
+    Ui.set_pa(ENV.getPressure());
+    Ui.set_motion(Motion.getValue());
     Ui.update();
     TaskDelay(delay_Time);
 }
