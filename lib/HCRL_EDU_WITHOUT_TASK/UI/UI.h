@@ -114,7 +114,7 @@ public:
   void node_setTitle(uint8_t index, String title_1st = "", String title_2nd = "");
   void node_setTitleColor(uint8_t index, uint16_t title_1st, uint16_t title_2nd);
   void node_setAllTitleColor(uint16_t title_1st, uint16_t title_2nd);
-  void node_setTitlePic(uint8_t index, char *base_path, char *hover_path);
+  void node_setTitlePic(uint8_t index, const char *base_path, const char *hover_path);
   void node_setType(uint8_t index, uint8_t typeSelect);
   //
   void wifi_ssid_set(char *ssid);

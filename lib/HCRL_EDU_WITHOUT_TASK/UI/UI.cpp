@@ -714,12 +714,12 @@ void UI::node_setType(uint8_t index, uint8_t typeSelect)
 
   *** 103 x 103 pixels image
 */
-void UI::node_setTitlePic(uint8_t index, char *base_path, char *hover_path)
+void UI::node_setTitlePic(uint8_t index, const char *base_path, const char *hover_path)
 {
   if (node[index].EN)
   {
-    this->node[index].titlePic = base_path;
-    this->node[index].titlePic_Hover = hover_path;
+    this->node[index].titlePic = (char *)base_path;
+    this->node[index].titlePic_Hover = (char *)hover_path;
   }
 }
 
