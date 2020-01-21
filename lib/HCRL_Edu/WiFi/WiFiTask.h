@@ -73,7 +73,7 @@ boolean WiFiTask::getStatus()
 */
 char *WiFiTask::getSSID()
 {
-    return this->wrapper.getSSID();
+    return this->SSID;
 }
 /* 
     Get Password
