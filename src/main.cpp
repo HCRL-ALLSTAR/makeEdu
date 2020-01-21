@@ -28,7 +28,7 @@ HCRL_Edu hcrl;
 #define KEY_B "B"
 
 //Make Json
-void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus);
+void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *);
 void SubAir(byte *payload, unsigned int length);
 void SubFan(byte *payload, unsigned int length);
 void PubENV(const char *topic);
@@ -46,6 +46,10 @@ uint8_t light_1Status;
 uint8_t light_2Status;
 uint8_t light_3Status;
 
+uint16_t light_1RGB[3];
+uint16_t light_2RGB[3];
+uint16_t light_3RGB[3];
+
 uint8_t airStatus;
 uint8_t airTemp;
 uint8_t fanStatus;
@@ -55,9 +59,10 @@ millisDelay pubDelay;
 
 void setup(void)
 {
-	//Serial.begin(115200);
-	hcrl.Ui.begin();
+	//WiFi
 	hcrl.WiFi.Begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
+
+	//MQTT
 	hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
 	hcrl.MQTT.startSubscribe(SUB_AIR);
 	hcrl.MQTT.startSubscribe(SUB_FAN);
@@ -65,6 +70,10 @@ void setup(void)
 	hcrl.MQTT.startSubscribe(SUB_LIGHT_2);
 	hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
 
+	//Serial.begin(115200);
+	hcrl.Ui.begin();
+
+	//UI
 	hcrl.Ui.node_init(5);
 	for (int i = 0; i < 5; i++)
 	{
@@ -88,6 +97,7 @@ void setup(void)
 	hcrl.Ui.node_setTitle(2, "LIGHT", "Overall");
 	hcrl.Ui.node_setTitlePic(2, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
 
+	//Sensor
 	hcrl.ENV.begin();
 	hcrl.Motion.begin();
 	pubDelay.start(Sec2MS(1));
@@ -133,15 +143,15 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
 	Serial.println("[" + topic_str + "]: " + payload_str);
 	if (topic_str.equals(SUB_LIGHT_1))
 	{
-		SubLight(Paylaod, Length, &light_1Status);
+		SubLight(Paylaod, Length, &light_1Status, light_1RGB);
 	}
 	else if (topic_str.equals(SUB_LIGHT_2))
 	{
-		SubLight(Paylaod, Length, &light_2Status);
+		SubLight(Paylaod, Length, &light_2Status, light_2RGB);
 	}
 	else if (topic_str.equals(SUB_LIGHT_3))
 	{
-		SubLight(Paylaod, Length, &light_3Status);
+		SubLight(Paylaod, Length, &light_3Status, light_3RGB);
 	}
 	else if (topic_str.equals(SUB_AIR))
 	{
@@ -161,11 +171,14 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
     "B": number		--> Blue
 }
 */
-void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus)
+void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *lightRGB)
 {
 	StaticJsonDocument<1024> doc;
 	deserializeJson(doc, payload, length);
 	*lightStatus = doc[KEY_STATUS];
+	lightRGB[0] = doc[KEY_R];
+	lightRGB[1] = doc[KEY_G];
+	lightRGB[2] = doc[KEY_B];
 }
 
 /*
