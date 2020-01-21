@@ -67,7 +67,10 @@ void MqttTask::begin(const char *Server, int Port, MQTT_CALLBACK_SIGNATURE)
 
 void MqttTask::update()
 {
-    xTaskCreate(updateCode, "MQTT UPDATE TASK", Default_Task_Stack, this, 1, &updateHandle);
+    if (updateHandle == NULL)
+    {
+        xTaskCreate(updateCode, "MQTT UPDATE TASK", Default_Task_Stack, this, 1, &updateHandle);
+    }
 }
 
 void MqttTask::updateCode(void *pv)
@@ -75,6 +78,7 @@ void MqttTask::updateCode(void *pv)
     MqttTask *task = (MqttTask *)(pv);
     for (;;)
     {
+
         if (task->isNewTopic || task->wrapper.SubscribeTopic[0].length() == 0)
         {
             //vTaskDelete(task->updateHandle);
@@ -85,6 +89,11 @@ void MqttTask::updateCode(void *pv)
         {
             task->wrapper.Update();
         }
+        if (!task->wrapper.isConnected())
+        {
+            task->wrapper.Update();
+        }
+
         TaskDelay(delay_Time);
     }
 }

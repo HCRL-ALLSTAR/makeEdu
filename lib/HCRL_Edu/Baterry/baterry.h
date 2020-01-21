@@ -46,7 +46,7 @@ void BaterryClass::updateCode(void *pv)
 void BaterryClass::begin()
 {
     Wire.begin();
-    xTaskCreate(updateCode, "bat update", 1024, this, 1, &updateHandle);
+    xTaskCreate(updateCode, "bat update", 2048, this, 1, &updateHandle);
 }
 int BaterryClass::getLevel()
 {
