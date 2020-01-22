@@ -1,7 +1,5 @@
 #include <Arduino.h>
-#include <HCRL_Edu.h>
-#include <millisDelay.h>
-HCRL_Edu hcrl;
+#include "HCRL_EDU.h"
 
 #define PUB_LIGHT_1 "M5/light1"
 #define PUB_LIGHT_2 "M5/light2"
@@ -26,7 +24,6 @@ HCRL_Edu hcrl;
 #define KEY_G "G"
 #define KEY_B "B"
 
-//Make Json
 void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *);
 void SubAir(byte *payload, unsigned int length);
 void SubFan(byte *payload, unsigned int length);
@@ -55,21 +52,30 @@ uint8_t fanStatus;
 uint8_t fanLevel;
 
 millisDelay pubDelay;
+millisDelay ledRand;
+HCRL_EDU hcrl;
 
-void setup(void)
+void setup()
 {
-	//WiFi
-	hcrl.WiFi.Begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
-
-	//MQTT
+	Serial.begin(115200);
+	hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
 	hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
+	hcrl.MQTT.startSubscribe("/test");
 	hcrl.MQTT.startSubscribe(SUB_AIR);
 	hcrl.MQTT.startSubscribe(SUB_FAN);
 	hcrl.MQTT.startSubscribe(SUB_LIGHT_1);
 	hcrl.MQTT.startSubscribe(SUB_LIGHT_2);
 	hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
 
-	//Serial.begin(115200);
+	//Get Status
+	Sprintln("WiFi SSID : " + String(hcrl.WiFi.getSSID()));
+	Sprintln("WiFi Status : " + String(hcrl.WiFi.getStatus()));
+
+	Sprintln("MQTT Server : " + String(hcrl.MQTT.getServer()));
+	Sprintln("MQTT Port : " + String(hcrl.MQTT.getPort()));
+	Sprintln("MQTT Username : " + String(hcrl.MQTT.getUsername()));
+	Sprintln("MQTT Status : " + String(hcrl.MQTT.getStatus()));
+
 	hcrl.Ui.begin();
 
 	//UI
@@ -96,18 +102,25 @@ void setup(void)
 	hcrl.Ui.node_setTitle(2, "LIGHT", "Overall");
 	hcrl.Ui.node_setTitlePic(2, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
 
-	//Sensor
+	pubDelay.start(Sec2MS(3));
+	ledRand.start(Sec2MS(1));
+
+	hcrl.ANGLE.begin();
 	hcrl.ENV.begin();
-	hcrl.Motion.begin();
-	pubDelay.start(Sec2MS(1));
+	hcrl.MOTION.begin();
+	hcrl.RGB_LED.begin();
+	hcrl.RGB_LED.setBrightness(50);
+
+	hcrl.RGB_STRIP.begin();
+	hcrl.RGB_STRIP.setBrightness(255);
 }
-void loop(void)
+
+void loop()
 {
-	//Random And Get Value
 	temp = hcrl.ENV.getTemp();
 	humi = hcrl.ENV.getHumi();
 	pressure = hcrl.ENV.getPressure();
-	motionStatus = hcrl.Motion.getValue();
+	motionStatus = hcrl.MOTION.getValue();
 	light_1Status = random(0, 2);
 	light_2Status = random(0, 2);
 	light_3Status = random(0, 2);
@@ -116,7 +129,18 @@ void loop(void)
 	fanStatus = random(0, 2);
 	fanLevel = random(1, 4);
 
-	//Pub Data to Server
+	if (ledRand.justFinished())
+	{
+		for (int i = 0; i < RGB_LED_PIXELS; i++)
+		{
+			hcrl.RGB_LED.setPixelsColor(i, random(255), random(255), random(255));
+		}
+		for (int i = 0; i < RGB_STRIP_PIXELS; i++)
+		{
+			hcrl.RGB_STRIP.setPixelsColor(i, random(255), random(255), random(255));
+		}
+		ledRand.repeat();
+	}
 
 	if (pubDelay.justFinished())
 	{
@@ -130,11 +154,11 @@ void loop(void)
 		pubDelay.repeat();
 	}
 
-	// Update Data
-	randomSeed(millis());
 	hcrl.update();
+	randomSeed(millis());
 }
 
+// Default Callback Function
 void callback(char *Topic, byte *Paylaod, unsigned int Length)
 {
 	Paylaod[Length] = '\0';
