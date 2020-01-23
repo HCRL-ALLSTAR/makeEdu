@@ -116,15 +116,19 @@ public:
   void node_setAllTitleColor(uint16_t title_1st, uint16_t title_2nd);
   void node_setTitlePic(uint8_t index, const char *base_path, const char *hover_path);
   void node_setType(uint8_t index, uint8_t typeSelect);
+  uint8_t get_node_data(int index);
+  int8_t get_node_temp(int index);
+  void set_node_data(int index , uint8_t newData);
+  void set_node_temp(int index , uint8_t newTemp);
   //
-  void wifi_ssid_set(char *ssid);
-  void wifi_status_set(bool status);
-  void mqtt_ip_set(char *ip);
-  void mqtt_status_set(bool status);
-  void temp_set(float temp);
-  void humid_set(float humid);
-  void pa_set(float pressure);
-  void motion_set(int motion);
+  void set_wifi_ssid(char *ssid);
+  void set_wifi_status(bool status);
+  void set_mqtt_ip(char *ip);
+  void set_mqtt_status(bool status);
+  void set_temp(float temp);
+  void set_humid(float humid);
+  void set_pa(float pressure);
+  void set_motion(int motion);
 
 private:
 //custom RGB565

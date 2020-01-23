@@ -59,6 +59,7 @@ void setup()
 {
 	Serial.begin(115200);
 	hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
+	// hcrl.WiFi.begin();
 	hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
 	hcrl.MQTT.startSubscribe("/test");
 	hcrl.MQTT.startSubscribe(SUB_AIR);
@@ -120,15 +121,21 @@ void loop()
 	temp = hcrl.ENV.getTemp();
 	humi = hcrl.ENV.getHumi();
 	pressure = hcrl.ENV.getPressure();
-	motionStatus = hcrl.MOTION.getValue();
-	light_1Status = random(0, 2);
-	light_2Status = random(0, 2);
-	light_3Status = random(0, 2);
-	airStatus = random(0, 2);
-	airTemp = random(25, 34);
-	fanStatus = random(0, 2);
-	fanLevel = random(1, 4);
-
+	motionStatus = hcrl.MOTION.getValue(); //////////edit////////////
+	light_1Status = hcrl.Ui.get_node_data(2);
+	light_2Status = hcrl.Ui.get_node_data(3);
+	light_3Status = hcrl.Ui.get_node_data(4);
+	airStatus = hcrl.Ui.get_node_data(1);
+	airTemp = hcrl.Ui.get_node_temp(1);
+	fanLevel = hcrl.Ui.get_node_data(0);
+	if(fanLevel > 0)//on
+	{
+		fanStatus = 1;
+	}
+	else if(fanLevel == 0)//off
+	{
+		fanStatus = 0;
+	}
 	if (ledRand.justFinished())
 	{
 		for (int i = 0; i < RGB_LED_PIXELS; i++)

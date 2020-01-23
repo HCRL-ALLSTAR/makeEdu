@@ -744,12 +744,12 @@ void UI::node_setAllTitleColor(uint16_t title_1st, uint16_t title_2nd)
 }
 
 //set wifi ssid
-void UI::wifi_ssid_set(char *ssid)
+void UI::set_wifi_ssid(char *ssid)
 {
   this->wifi_ssid = ssid;
 }
 //set wifi status
-void UI::wifi_status_set(bool status)
+void UI::set_wifi_status(bool status)
 {
   if (status)
     this->wifi_status = "Connected";
@@ -757,12 +757,12 @@ void UI::wifi_status_set(bool status)
     this->wifi_status = "Disconnected";
 }
 //set mqtt ip address
-void UI::mqtt_ip_set(char *ip)
+void UI::set_mqtt_ip(char *ip)
 {
   this->mqtt_ip = ip;
 }
 //set mqtt status
-void UI::mqtt_status_set(bool status)
+void UI::set_mqtt_status(bool status)
 {
   if (status)
     this->mqtt_status = "Connected";
@@ -770,22 +770,42 @@ void UI::mqtt_status_set(bool status)
     this->mqtt_status = "Disconnected";
 }
 //set temperature
-void UI::temp_set(float temp)
+void UI::set_temp(float temp)
 {
   this->temp = temp;
 }
 //set humidity
-void UI::humid_set(float humid)
+void UI::set_humid(float humid)
 {
   this->humid = humid;
 }
 //set pressure
-void UI::pa_set(float pressure)
+void UI::set_pa(float pressure)
 {
   this->pa = pressure;
 }
 //set pir value
-void UI::motion_set(int motion)
+void UI::set_motion(int motion)
 {
   this->motion = motion;
+}
+
+
+//get Method
+uint8_t UI::get_node_data(int index)
+{
+  return node[index].data;
+}
+int8_t UI::get_node_temp(int index)
+{
+  return node[index].temp_data;
+}
+
+void UI::set_node_data(int index , uint8_t newData)
+{
+  this->node[index].data = newData;
+}
+void UI::set_node_temp(int index , uint8_t newTemp)
+{
+  this->node[index].temp_data = newTemp;
 }
