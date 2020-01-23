@@ -55,6 +55,14 @@ millisDelay pubDelay;
 millisDelay ledRand;
 HCRL_EDU hcrl;
 
+#define FAN_INDEX 0
+#define AIR_INDEX 1
+#define LIGHT_1_INDEX 2
+#define LIGHT_2_INDEX 3
+#define LIGHT_3_INDEX 4
+
+int data[5] = {0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light
+
 void setup()
 {
 	Serial.begin(115200);
@@ -152,13 +160,28 @@ void loop()
 
 	if (pubDelay.justFinished())
 	{
-		PubAir(PUB_AIR);
+		if(data[1] != airStatus)
+		{
+			data[1] = airStatus;
+			PubAir(PUB_AIR);
+		}	
 		PubENV(PUB_ENV);
-		PubFan(PUB_FAN);
+		if(data[0] != fanStatus)
+		{
+			data[0] = fanStatus;
+			PubFan(PUB_FAN);
+		}
 		PubPIR(PUB_PIR);
-		PubLight(PUB_LIGHT_1, light_1Status);
-		PubLight(PUB_LIGHT_2, light_2Status);
-		PubLight(PUB_LIGHT_3, light_3Status);
+		if(data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
+		{
+			data[2] = light_1Status;
+			data[3] = light_2Status;
+			data[4] = light_3Status;
+			PubLight(PUB_LIGHT_1, light_1Status);
+			PubLight(PUB_LIGHT_2, light_2Status);
+			PubLight(PUB_LIGHT_3, light_3Status);
+		}
+		
 		pubDelay.repeat();
 	}
 
@@ -224,6 +247,7 @@ void SubAir(byte *payload, unsigned int length)
 	deserializeJson(doc, payload, length);
 	airStatus = doc[KEY_STATUS];
 	airTemp = doc[KEY_TEMP];
+	hcrl.Ui.set_node_data(1,airStatus);
 }
 
 /*
