@@ -232,6 +232,13 @@ void UI::update()
   {
     main();
   }
+
+  //Update data from Node-red
+
+
+  //Setting Update
+
+
   //frame control
   framerate_update();
 }
@@ -556,7 +563,7 @@ void UI::sett_panel()
   m.leftBtn_enable = true;
   m.midBtn_enable = true;
   m.rightBtn_enable = true;
-
+  // Lcd.drawRect(0,0,)
   Lcd.setTextColor(st_panel.titleColor);
   Lcd.setCursor(10, 10);
   Lcd.setTextSize(st_panel.titleSize);

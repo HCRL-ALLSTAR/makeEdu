@@ -128,6 +128,7 @@ void loop()
 	airStatus = hcrl.Ui.get_node_data(1);
 	airTemp = hcrl.Ui.get_node_temp(1);
 	fanLevel = hcrl.Ui.get_node_data(0);
+	
 	if(fanLevel > 0)//on
 	{
 		fanStatus = 1;
