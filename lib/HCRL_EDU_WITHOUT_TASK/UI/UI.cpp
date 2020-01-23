@@ -233,8 +233,6 @@ void UI::update()
     main();
   }
 
-  //Update data from Node-red
-
 
   //Setting Update
 
@@ -811,8 +809,14 @@ int8_t UI::get_node_temp(int index)
 void UI::set_node_data(int index , uint8_t newData)
 {
   this->node[index].data = newData;
+  this->node[index].last_data = -1;
+  this->node[index].last_temp_data = -1;
+  main();
 }
 void UI::set_node_temp(int index , uint8_t newTemp)
 {
   this->node[index].temp_data = newTemp;
+  this->node[index].last_data = -1;
+  this->node[index].last_temp_data = -1;
+  main();
 }

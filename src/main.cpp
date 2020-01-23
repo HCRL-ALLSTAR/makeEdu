@@ -158,7 +158,7 @@ void loop()
 		ledRand.repeat();
 	}
 
-	if (pubDelay.justFinished())
+	if (pubDelay.justFinished()) //m5->Node-red
 	{
 		if(data[1] != airStatus)
 		{
@@ -262,6 +262,7 @@ void SubFan(byte *payload, unsigned int length)
 	deserializeJson(doc, payload, length);
 	fanStatus = doc[KEY_STATUS];
 	fanLevel = doc[KEY_LEVEL];
+	hcrl.Ui.set_node_data(0,fanStatus);
 }
 
 /*
