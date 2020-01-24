@@ -86,8 +86,8 @@ void mqttWrapper::reconnect()
         {
             Sprintln("Connected");
 
-            this->mqtt.publish("start", "Hello world");
-            this->mqtt.subscribe("intopic");
+            this->mqtt.publish("M5/Start", "Hello world");
+            this->mqtt.subscribe("Node/Start");
 
             while (this->subscribeList[Index].length() != 0)
             {

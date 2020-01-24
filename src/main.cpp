@@ -24,7 +24,7 @@
 #define KEY_G "G"
 #define KEY_B "B"
 
-void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *);
+void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *, uint8_t lightIndex);
 void SubAir(byte *payload, unsigned int length);
 void SubFan(byte *payload, unsigned int length);
 void PubENV(const char *topic);
@@ -99,17 +99,25 @@ void setup()
 
 	hcrl.Ui.node_setAllTitleColor(WHITE, CYAN);
 
-	hcrl.Ui.node_setType(0, FAN);
-	hcrl.Ui.node_setTitle(0, "Fan", "Near Door");
-	hcrl.Ui.node_setTitlePic(0, "/FAN/Fan_BLUE.png", "/FAN/Fan_BLUE_Hover.png");
+	hcrl.Ui.node_setType(FAN_INDEX, FAN);
+	hcrl.Ui.node_setTitle(FAN_INDEX, "Fan", "Near Door");
+	hcrl.Ui.node_setTitlePic(FAN_INDEX, "/FAN/Fan_BLUE.png", "/FAN/Fan_BLUE_Hover.png");
 
-	hcrl.Ui.node_setType(1, AIR);
-	hcrl.Ui.node_setTitle(1, "Air", " ");
-	hcrl.Ui.node_setTitlePic(1, "/AIR/Air_RED.png", "/AIR/Air_RED_Hover.png");
+	hcrl.Ui.node_setType(AIR_INDEX, AIR);
+	hcrl.Ui.node_setTitle(AIR_INDEX, "Air", " ");
+	hcrl.Ui.node_setTitlePic(AIR_INDEX, "/AIR/Air_RED.png", "/AIR/Air_RED_Hover.png");
 
-	hcrl.Ui.node_setType(2, LIGHT);
-	hcrl.Ui.node_setTitle(2, "LIGHT", "Overall");
-	hcrl.Ui.node_setTitlePic(2, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+	hcrl.Ui.node_setType(LIGHT_1_INDEX, LIGHT);
+	hcrl.Ui.node_setTitle(LIGHT_1_INDEX, "LIGHT", "1");
+	hcrl.Ui.node_setTitlePic(LIGHT_1_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+
+	hcrl.Ui.node_setType(LIGHT_2_INDEX, LIGHT);
+	hcrl.Ui.node_setTitle(LIGHT_2_INDEX, "LIGHT", "2");
+	hcrl.Ui.node_setTitlePic(LIGHT_2_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+
+	hcrl.Ui.node_setType(LIGHT_3_INDEX, LIGHT);
+	hcrl.Ui.node_setTitle(LIGHT_3_INDEX, "LIGHT", "3");
+	hcrl.Ui.node_setTitlePic(LIGHT_3_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
 
 	pubDelay.start(Sec2MS(3));
 	ledRand.start(Sec2MS(1));
@@ -129,12 +137,16 @@ void loop()
 	temp = hcrl.ENV.getTemp();
 	humi = hcrl.ENV.getHumi();
 	pressure = hcrl.ENV.getPressure();
-	motionStatus = hcrl.MOTION.getValue(); //////////edit////////////
+
+	motionStatus = hcrl.MOTION.getValue();
+
 	light_1Status = hcrl.Ui.get_node_data(2);
 	light_2Status = hcrl.Ui.get_node_data(3);
 	light_3Status = hcrl.Ui.get_node_data(4);
+
 	airStatus = hcrl.Ui.get_node_data(1);
 	airTemp = hcrl.Ui.get_node_temp(1);
+
 	fanLevel = hcrl.Ui.get_node_data(0);
 
 	if (fanLevel > 0) //on
@@ -198,16 +210,15 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
 	Serial.println("[" + topic_str + "]: " + payload_str);
 	if (topic_str.equals(SUB_LIGHT_1))
 	{
-		SubLight(Paylaod, Length, &light_1Status, light_1RGB);
-		hcrl.Ui.set_node_data(LIGHT_1_INDEX, light_1Status);
+		SubLight(Paylaod, Length, &light_1Status, light_1RGB, LIGHT_1_INDEX);
 	}
 	else if (topic_str.equals(SUB_LIGHT_2))
 	{
-		SubLight(Paylaod, Length, &light_2Status, light_2RGB);
+		SubLight(Paylaod, Length, &light_2Status, light_2RGB, LIGHT_2_INDEX);
 	}
 	else if (topic_str.equals(SUB_LIGHT_3))
 	{
-		SubLight(Paylaod, Length, &light_3Status, light_3RGB);
+		SubLight(Paylaod, Length, &light_3Status, light_3RGB, LIGHT_3_INDEX);
 	}
 	else if (topic_str.equals(SUB_AIR))
 	{
@@ -227,7 +238,7 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
     "B": number		--> Blue
 }
 */
-void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *lightRGB)
+void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *lightRGB, uint8_t lightIndex)
 {
 	StaticJsonDocument<1024> doc;
 	deserializeJson(doc, payload, length);
@@ -235,6 +246,7 @@ void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t
 	lightRGB[0] = doc[KEY_R];
 	lightRGB[1] = doc[KEY_G];
 	lightRGB[2] = doc[KEY_B];
+	hcrl.Ui.set_node_data(lightIndex, *lightStatus);
 }
 
 /*
