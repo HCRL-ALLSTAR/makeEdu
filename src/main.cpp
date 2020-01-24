@@ -61,7 +61,7 @@ HCRL_EDU hcrl;
 #define LIGHT_2_INDEX 3
 #define LIGHT_3_INDEX 4
 
-int data[5] = {0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light
+int data[6] = {0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp
 
 void setup()
 {
@@ -118,10 +118,10 @@ void setup()
 	hcrl.ENV.begin();
 	hcrl.MOTION.begin();
 	hcrl.RGB_LED.begin();
-	hcrl.RGB_LED.setBrightness(50);
+	hcrl.RGB_LED.setBrightness(10);
 
 	hcrl.RGB_STRIP.begin();
-	hcrl.RGB_STRIP.setBrightness(255);
+	hcrl.RGB_STRIP.setBrightness(10);
 }
 
 void loop()
@@ -136,12 +136,12 @@ void loop()
 	airStatus = hcrl.Ui.get_node_data(1);
 	airTemp = hcrl.Ui.get_node_temp(1);
 	fanLevel = hcrl.Ui.get_node_data(0);
-	
-	if(fanLevel > 0)//on
+
+	if (fanLevel > 0) //on
 	{
 		fanStatus = 1;
 	}
-	else if(fanLevel == 0)//off
+	else if (fanLevel == 0) //off
 	{
 		fanStatus = 0;
 	}
@@ -160,19 +160,20 @@ void loop()
 
 	if (pubDelay.justFinished()) //m5->Node-red
 	{
-		if(data[1] != airStatus)
+		if (data[1] != airStatus || data[5] != airTemp)
 		{
 			data[1] = airStatus;
+			data[5] = airTemp;
 			PubAir(PUB_AIR);
-		}	
+		}
 		PubENV(PUB_ENV);
-		if(data[0] != fanStatus)
+		if (data[0] != fanLevel)
 		{
-			data[0] = fanStatus;
+			data[0] = fanLevel;
 			PubFan(PUB_FAN);
 		}
 		PubPIR(PUB_PIR);
-		if(data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
+		if (data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
 		{
 			data[2] = light_1Status;
 			data[3] = light_2Status;
@@ -181,7 +182,7 @@ void loop()
 			PubLight(PUB_LIGHT_2, light_2Status);
 			PubLight(PUB_LIGHT_3, light_3Status);
 		}
-		
+
 		pubDelay.repeat();
 	}
 
@@ -198,6 +199,7 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
 	if (topic_str.equals(SUB_LIGHT_1))
 	{
 		SubLight(Paylaod, Length, &light_1Status, light_1RGB);
+		hcrl.Ui.set_node_data(LIGHT_1_INDEX, light_1Status);
 	}
 	else if (topic_str.equals(SUB_LIGHT_2))
 	{
@@ -245,9 +247,14 @@ void SubAir(byte *payload, unsigned int length)
 {
 	StaticJsonDocument<1024> doc;
 	deserializeJson(doc, payload, length);
+
 	airStatus = doc[KEY_STATUS];
+	data[1] = airStatus;
+	hcrl.Ui.set_node_data(1, airStatus);
+
 	airTemp = doc[KEY_TEMP];
-	hcrl.Ui.set_node_data(1,airStatus);
+	data[5] = airTemp;
+	hcrl.Ui.set_node_temp(1, airTemp);
 }
 
 /*
@@ -262,7 +269,7 @@ void SubFan(byte *payload, unsigned int length)
 	deserializeJson(doc, payload, length);
 	fanStatus = doc[KEY_STATUS];
 	fanLevel = doc[KEY_LEVEL];
-	hcrl.Ui.set_node_data(0,fanStatus);
+	hcrl.Ui.set_node_data(0, fanStatus);
 }
 
 /*

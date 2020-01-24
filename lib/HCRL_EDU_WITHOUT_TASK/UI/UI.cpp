@@ -233,9 +233,7 @@ void UI::update()
     main();
   }
 
-
   //Setting Update
-
 
   //frame control
   framerate_update();
@@ -795,7 +793,6 @@ void UI::set_motion(int motion)
   this->motion = motion;
 }
 
-
 //get Method
 uint8_t UI::get_node_data(int index)
 {
@@ -806,17 +803,23 @@ int8_t UI::get_node_temp(int index)
   return node[index].temp_data;
 }
 
-void UI::set_node_data(int index , uint8_t newData)
+void UI::set_node_data(int index, uint8_t newData)
 {
   this->node[index].data = newData;
   this->node[index].last_data = -1;
+  this->c_panel.lastIndex = -1;
   this->node[index].last_temp_data = -1;
-  main();
+  // Lcd.fillRect(0, 0, 320, 218, backgroundColor);
+  // if (tick_frame())
+  // {
+  // main();
+  // }
+  // framerate_update();
 }
-void UI::set_node_temp(int index , uint8_t newTemp)
+void UI::set_node_temp(int index, uint8_t newTemp)
 {
   this->node[index].temp_data = newTemp;
   this->node[index].last_data = -1;
+  this->c_panel.lastIndex = -1;
   this->node[index].last_temp_data = -1;
-  main();
 }

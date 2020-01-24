@@ -118,8 +118,8 @@ public:
   void node_setType(uint8_t index, uint8_t typeSelect);
   uint8_t get_node_data(int index);
   int8_t get_node_temp(int index);
-  void set_node_data(int index , uint8_t newData);
-  void set_node_temp(int index , uint8_t newTemp);
+  void set_node_data(int index, uint8_t newData);
+  void set_node_temp(int index, uint8_t newTemp);
   //
   void set_wifi_ssid(char *ssid);
   void set_wifi_status(bool status);
@@ -140,8 +140,9 @@ private:
 #define SETT 3
 #define AIRCONT 10
 #define RETURN_MS 1000
-#define POS_RETURN_MS 200
+#define POS_RETURN_MS 600
 #define AC_RETURN_MS 600
+
   //
   uint8_t panel = 0;
   uint8_t sub_panel = 0;
