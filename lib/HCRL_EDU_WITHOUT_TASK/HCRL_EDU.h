@@ -55,6 +55,9 @@ HCRL_EDU::~HCRL_EDU()
 
 void HCRL_EDU::update()
 {
+    RGB_LED.update();
+    RGB_STRIP.update();
+    MQTT.update();
     Ui.set_wifi_ssid(WiFi.getSSID());
     Ui.set_wifi_status(WiFi.getStatus());
     Ui.set_mqtt_ip(MQTT.getServer());
@@ -64,9 +67,6 @@ void HCRL_EDU::update()
     Ui.set_pa(ENV.getPressure());
     Ui.set_motion(MOTION.getValue());
     Ui.update();
-    RGB_LED.update();
-    RGB_STRIP.update();
-    MQTT.update();
 }
 
 #endif
