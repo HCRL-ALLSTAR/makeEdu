@@ -8,9 +8,9 @@ class angleClass
 private:
     /* data */
 
-    int sensorPin = 36;
-    int lastSensorValue = 100;
-    int curSensorValue = 0;
+    uint8_t sensorPin = 36;
+    uint16_t lastSensorValue = 100;
+    uint16_t curSensorValue = 0;
 
 public:
     angleClass(/* args */);

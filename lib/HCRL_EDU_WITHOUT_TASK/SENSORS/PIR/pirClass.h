@@ -6,7 +6,7 @@
 class pirClass
 {
 private:
-    int value;
+    uint8_t value;
     /* data */
 public:
     pirClass(/* args */);

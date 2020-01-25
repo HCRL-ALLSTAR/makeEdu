@@ -8,8 +8,8 @@ class rgbLedClass
 {
 private:
     /* data */
-    int LedPin = RGB_LED_PIN;
-    int NumPixels = RGB_LED_PIXELS;
+    uint8_t LedPin = RGB_LED_PIN;
+    uint8_t NumPixels = RGB_LED_PIXELS;
     boolean isStart = false;
     Adafruit_NeoPixel pixels;
 
