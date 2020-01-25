@@ -16,6 +16,12 @@
 #include "JSON/jsonwrapper.hpp"
 
 using jsonWrapper = json;
+using uiWrapper = UI;
+using angleWrapper = angleClass;
+using pirWrapper = pirClass;
+using envWrapper = envClass;
+using rgbLedWrapper = rgbLedClass;
+using rgbStripWrapper = rgbStripClass;
 
 class HCRL_EDU
 {
@@ -29,13 +35,13 @@ public:
     mqttWrapper MQTT;
     jsonWrapper JSON;
 
-    UI Ui;
+    uiWrapper Ui;
 
-    angleClass ANGLE;
-    pirClass MOTION;
-    envClass ENV;
-    rgbLedClass RGB_LED;
-    rgbStripClass RGB_STRIP;
+    angleWrapper ANGLE;
+    pirWrapper MOTION;
+    envWrapper ENV;
+    rgbLedWrapper RGB_LED;
+    rgbStripWrapper RGB_STRIP;
     void update();
 };
 
