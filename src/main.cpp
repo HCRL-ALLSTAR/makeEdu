@@ -65,169 +65,169 @@ int data[6] = {0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp
 
 void setup()
 {
-	Serial.begin(115200);
-	hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
-	// hcrl.WiFi.begin();
-	hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
-	hcrl.MQTT.startSubscribe("/test");
-	hcrl.MQTT.startSubscribe(SUB_AIR);
-	hcrl.MQTT.startSubscribe(SUB_FAN);
-	hcrl.MQTT.startSubscribe(SUB_LIGHT_1);
-	hcrl.MQTT.startSubscribe(SUB_LIGHT_2);
-	hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
+    Serial.begin(115200);
+    hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
+    // hcrl.WiFi.begin();
+    hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
+    hcrl.MQTT.startSubscribe("/test");
+    hcrl.MQTT.startSubscribe(SUB_AIR);
+    hcrl.MQTT.startSubscribe(SUB_FAN);
+    hcrl.MQTT.startSubscribe(SUB_LIGHT_1);
+    hcrl.MQTT.startSubscribe(SUB_LIGHT_2);
+    hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
 
-	//Get Status
-	Sprintln("WiFi SSID : " + String(hcrl.WiFi.getSSID()));
-	Sprintln("WiFi Status : " + String(hcrl.WiFi.getStatus()));
+    //Get Status
+    Sprintln("WiFi SSID : " + String(hcrl.WiFi.getSSID()));
+    Sprintln("WiFi Status : " + String(hcrl.WiFi.getStatus()));
 
-	Sprintln("MQTT Server : " + String(hcrl.MQTT.getServer()));
-	Sprintln("MQTT Port : " + String(hcrl.MQTT.getPort()));
-	Sprintln("MQTT Username : " + String(hcrl.MQTT.getUsername()));
-	Sprintln("MQTT Status : " + String(hcrl.MQTT.getStatus()));
+    Sprintln("MQTT Server : " + String(hcrl.MQTT.getServer()));
+    Sprintln("MQTT Port : " + String(hcrl.MQTT.getPort()));
+    Sprintln("MQTT Username : " + String(hcrl.MQTT.getUsername()));
+    Sprintln("MQTT Status : " + String(hcrl.MQTT.getStatus()));
 
-	hcrl.Ui.begin();
+    hcrl.Ui.begin();
 
-	//UI
-	hcrl.Ui.node_init(5);
-	for (int i = 0; i < 5; i++)
-	{
-		char buffer[50];
-		sprintf(buffer, "Item %d", i);
-		hcrl.Ui.node_setTitle(i, (String)buffer, "abcdefghijkl");
-		hcrl.Ui.node_setTitlePic(i, "/AIR/Air_GREEN.png", "/AIR/Air_GREEN_Hover.png");
-	}
+    //UI
+    hcrl.Ui.node_init(5);
+    for (int i = 0; i < 5; i++)
+    {
+        char buffer[50];
+        sprintf(buffer, "Item %d", i);
+        hcrl.Ui.node_setTitle(i, (String)buffer, "abcdefghijkl");
+        hcrl.Ui.node_setTitlePic(i, "/AIR/Air_GREEN.png", "/AIR/Air_GREEN_Hover.png");
+    }
 
-	hcrl.Ui.node_setAllTitleColor(WHITE, CYAN);
+    hcrl.Ui.node_setAllTitleColor(WHITE, CYAN);
 
-	hcrl.Ui.node_setType(FAN_INDEX, FAN);
-	hcrl.Ui.node_setTitle(FAN_INDEX, "Fan", "Near Door");
-	hcrl.Ui.node_setTitlePic(FAN_INDEX, "/FAN/Fan_BLUE.png", "/FAN/Fan_BLUE_Hover.png");
+    hcrl.Ui.node_setType(FAN_INDEX, FAN);
+    hcrl.Ui.node_setTitle(FAN_INDEX, "Fan", "Near Door");
+    hcrl.Ui.node_setTitlePic(FAN_INDEX, "/FAN/Fan_BLUE.png", "/FAN/Fan_BLUE_Hover.png");
 
-	hcrl.Ui.node_setType(AIR_INDEX, AIR);
-	hcrl.Ui.node_setTitle(AIR_INDEX, "Air", " ");
-	hcrl.Ui.node_setTitlePic(AIR_INDEX, "/AIR/Air_RED.png", "/AIR/Air_RED_Hover.png");
+    hcrl.Ui.node_setType(AIR_INDEX, AIR);
+    hcrl.Ui.node_setTitle(AIR_INDEX, "Air", " ");
+    hcrl.Ui.node_setTitlePic(AIR_INDEX, "/AIR/Air_RED.png", "/AIR/Air_RED_Hover.png");
 
-	hcrl.Ui.node_setType(LIGHT_1_INDEX, LIGHT);
-	hcrl.Ui.node_setTitle(LIGHT_1_INDEX, "LIGHT", "1");
-	hcrl.Ui.node_setTitlePic(LIGHT_1_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+    hcrl.Ui.node_setType(LIGHT_1_INDEX, LIGHT);
+    hcrl.Ui.node_setTitle(LIGHT_1_INDEX, "LIGHT", "1");
+    hcrl.Ui.node_setTitlePic(LIGHT_1_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
 
-	hcrl.Ui.node_setType(LIGHT_2_INDEX, LIGHT);
-	hcrl.Ui.node_setTitle(LIGHT_2_INDEX, "LIGHT", "2");
-	hcrl.Ui.node_setTitlePic(LIGHT_2_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+    hcrl.Ui.node_setType(LIGHT_2_INDEX, LIGHT);
+    hcrl.Ui.node_setTitle(LIGHT_2_INDEX, "LIGHT", "2");
+    hcrl.Ui.node_setTitlePic(LIGHT_2_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
 
-	hcrl.Ui.node_setType(LIGHT_3_INDEX, LIGHT);
-	hcrl.Ui.node_setTitle(LIGHT_3_INDEX, "LIGHT", "3");
-	hcrl.Ui.node_setTitlePic(LIGHT_3_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+    hcrl.Ui.node_setType(LIGHT_3_INDEX, LIGHT);
+    hcrl.Ui.node_setTitle(LIGHT_3_INDEX, "LIGHT", "3");
+    hcrl.Ui.node_setTitlePic(LIGHT_3_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
 
-	pubDelay.start(Sec2MS(3));
-	ledRand.start(Sec2MS(1));
+    pubDelay.start(Sec2MS(3));
+    ledRand.start(Sec2MS(1));
 
-	hcrl.ANGLE.begin();
-	hcrl.ENV.begin();
-	hcrl.MOTION.begin();
-	hcrl.RGB_LED.begin();
-	hcrl.RGB_LED.setBrightness(10);
+    hcrl.ANGLE.begin();
+    hcrl.ENV.begin();
+    hcrl.MOTION.begin();
+    hcrl.RGB_LED.begin();
+    hcrl.RGB_LED.setBrightness(10);
 
-	hcrl.RGB_STRIP.begin();
-	hcrl.RGB_STRIP.setBrightness(10);
+    hcrl.RGB_STRIP.begin();
+    hcrl.RGB_STRIP.setBrightness(10);
 }
 
 void loop()
 {
-	temp = hcrl.ENV.getTemp();
-	humi = hcrl.ENV.getHumi();
-	pressure = hcrl.ENV.getPressure();
+    temp = hcrl.ENV.getTemp();
+    humi = hcrl.ENV.getHumi();
+    pressure = hcrl.ENV.getPressure();
 
-	motionStatus = hcrl.MOTION.getValue();
+    motionStatus = hcrl.MOTION.getValue();
 
-	light_1Status = hcrl.Ui.get_node_data(2);
-	light_2Status = hcrl.Ui.get_node_data(3);
-	light_3Status = hcrl.Ui.get_node_data(4);
+    light_1Status = hcrl.Ui.get_node_data(2);
+    light_2Status = hcrl.Ui.get_node_data(3);
+    light_3Status = hcrl.Ui.get_node_data(4);
 
-	airStatus = hcrl.Ui.get_node_data(1);
-	airTemp = hcrl.Ui.get_node_temp(1);
+    airStatus = hcrl.Ui.get_node_data(1);
+    airTemp = hcrl.Ui.get_node_temp(1);
 
-	fanLevel = hcrl.Ui.get_node_data(0);
+    fanLevel = hcrl.Ui.get_node_data(0);
 
-	if (fanLevel > 0) //on
-	{
-		fanStatus = 1;
-	}
-	else if (fanLevel == 0) //off
-	{
-		fanStatus = 0;
-	}
-	if (ledRand.justFinished())
-	{
-		for (int i = 0; i < RGB_LED_PIXELS; i++)
-		{
-			hcrl.RGB_LED.setPixelsColor(i, random(255), random(255), random(255));
-		}
-		for (int i = 0; i < RGB_STRIP_PIXELS; i++)
-		{
-			hcrl.RGB_STRIP.setPixelsColor(i, random(255), random(255), random(255));
-		}
-		ledRand.repeat();
-	}
+    if (fanLevel > 0) //on
+    {
+        fanStatus = 1;
+    }
+    else if (fanLevel == 0) //off
+    {
+        fanStatus = 0;
+    }
+    if (ledRand.justFinished())
+    {
+        for (int i = 0; i < RGB_LED_PIXELS; i++)
+        {
+            hcrl.RGB_LED.setPixelsColor(i, random(255), random(255), random(255));
+        }
+        for (int i = 0; i < RGB_STRIP_PIXELS; i++)
+        {
+            hcrl.RGB_STRIP.setPixelsColor(i, random(255), random(255), random(255));
+        }
+        ledRand.repeat();
+    }
 
-	if (pubDelay.justFinished()) //m5->Node-red
-	{
-		if (data[1] != airStatus || data[5] != airTemp)
-		{
-			data[1] = airStatus;
-			data[5] = airTemp;
-			PubAir(PUB_AIR);
-		}
-		PubENV(PUB_ENV);
-		if (data[0] != fanLevel)
-		{
-			data[0] = fanLevel;
-			PubFan(PUB_FAN);
-		}
-		PubPIR(PUB_PIR);
-		if (data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
-		{
-			data[2] = light_1Status;
-			data[3] = light_2Status;
-			data[4] = light_3Status;
-			PubLight(PUB_LIGHT_1, light_1Status);
-			PubLight(PUB_LIGHT_2, light_2Status);
-			PubLight(PUB_LIGHT_3, light_3Status);
-		}
+    if (pubDelay.justFinished()) //m5->Node-red
+    {
+        if (data[1] != airStatus || data[5] != airTemp)
+        {
+            data[1] = airStatus;
+            data[5] = airTemp;
+            PubAir(PUB_AIR);
+        }
+        PubENV(PUB_ENV);
+        if (data[0] != fanLevel)
+        {
+            data[0] = fanLevel;
+            PubFan(PUB_FAN);
+        }
+        PubPIR(PUB_PIR);
+        if (data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
+        {
+            data[2] = light_1Status;
+            data[3] = light_2Status;
+            data[4] = light_3Status;
+            PubLight(PUB_LIGHT_1, light_1Status);
+            PubLight(PUB_LIGHT_2, light_2Status);
+            PubLight(PUB_LIGHT_3, light_3Status);
+        }
 
-		pubDelay.repeat();
-	}
+        pubDelay.repeat();
+    }
 
-	hcrl.update();
-	randomSeed(millis());
+    hcrl.update();
+    randomSeed(millis());
 }
 
 // Default Callback Function
 void callback(char *Topic, byte *Paylaod, unsigned int Length)
 {
-	Paylaod[Length] = '\0';
-	String topic_str = Topic, payload_str = (char *)Paylaod;
-	Serial.println("[" + topic_str + "]: " + payload_str);
-	if (topic_str.equals(SUB_LIGHT_1))
-	{
-		SubLight(Paylaod, Length, &light_1Status, light_1RGB, LIGHT_1_INDEX);
-	}
-	else if (topic_str.equals(SUB_LIGHT_2))
-	{
-		SubLight(Paylaod, Length, &light_2Status, light_2RGB, LIGHT_2_INDEX);
-	}
-	else if (topic_str.equals(SUB_LIGHT_3))
-	{
-		SubLight(Paylaod, Length, &light_3Status, light_3RGB, LIGHT_3_INDEX);
-	}
-	else if (topic_str.equals(SUB_AIR))
-	{
-		SubAir(Paylaod, Length);
-	}
-	else if (topic_str.equals(SUB_FAN))
-	{
-		SubFan(Paylaod, Length);
-	}
+    Paylaod[Length] = '\0';
+    String topic_str = Topic, payload_str = (char *)Paylaod;
+    Serial.println("[" + topic_str + "]: " + payload_str);
+    if (topic_str.equals(SUB_LIGHT_1))
+    {
+        SubLight(Paylaod, Length, &light_1Status, light_1RGB, LIGHT_1_INDEX);
+    }
+    else if (topic_str.equals(SUB_LIGHT_2))
+    {
+        SubLight(Paylaod, Length, &light_2Status, light_2RGB, LIGHT_2_INDEX);
+    }
+    else if (topic_str.equals(SUB_LIGHT_3))
+    {
+        SubLight(Paylaod, Length, &light_3Status, light_3RGB, LIGHT_3_INDEX);
+    }
+    else if (topic_str.equals(SUB_AIR))
+    {
+        SubAir(Paylaod, Length);
+    }
+    else if (topic_str.equals(SUB_FAN))
+    {
+        SubFan(Paylaod, Length);
+    }
 }
 
 /*
@@ -240,13 +240,13 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
 */
 void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *lightRGB, uint8_t lightIndex)
 {
-	StaticJsonDocument<1024> doc;
-	deserializeJson(doc, payload, length);
-	*lightStatus = doc[KEY_STATUS];
-	lightRGB[0] = doc[KEY_R];
-	lightRGB[1] = doc[KEY_G];
-	lightRGB[2] = doc[KEY_B];
-	hcrl.Ui.set_node_data(lightIndex, *lightStatus);
+    StaticJsonDocument<1024> doc;
+    deserializeJson(doc, payload, length);
+    *lightStatus = doc[KEY_STATUS];
+    lightRGB[0] = doc[KEY_R];
+    lightRGB[1] = doc[KEY_G];
+    lightRGB[2] = doc[KEY_B];
+    hcrl.Ui.set_node_data(lightIndex, *lightStatus);
 }
 
 /*
@@ -257,16 +257,16 @@ void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t
 */
 void SubAir(byte *payload, unsigned int length)
 {
-	StaticJsonDocument<1024> doc;
-	deserializeJson(doc, payload, length);
+    StaticJsonDocument<1024> doc;
+    deserializeJson(doc, payload, length);
 
-	airStatus = doc[KEY_STATUS];
-	data[1] = airStatus;
-	hcrl.Ui.set_node_data(1, airStatus);
+    airStatus = doc[KEY_STATUS];
+    data[1] = airStatus;
+    hcrl.Ui.set_node_data(1, airStatus);
 
-	airTemp = doc[KEY_TEMP];
-	data[5] = airTemp;
-	hcrl.Ui.set_node_temp(1, airTemp);
+    airTemp = doc[KEY_TEMP];
+    data[5] = airTemp;
+    hcrl.Ui.set_node_temp(1, airTemp);
 }
 
 /*
@@ -277,11 +277,11 @@ void SubAir(byte *payload, unsigned int length)
 */
 void SubFan(byte *payload, unsigned int length)
 {
-	StaticJsonDocument<1024> doc;
-	deserializeJson(doc, payload, length);
-	fanStatus = doc[KEY_STATUS];
-	fanLevel = doc[KEY_LEVEL];
-	hcrl.Ui.set_node_data(0, fanStatus);
+    StaticJsonDocument<1024> doc;
+    deserializeJson(doc, payload, length);
+    fanStatus = doc[KEY_STATUS];
+    fanLevel = doc[KEY_LEVEL];
+    hcrl.Ui.set_node_data(0, fanStatus);
 }
 
 /*
@@ -293,15 +293,15 @@ void SubFan(byte *payload, unsigned int length)
 */
 void PubENV(const char *topic)
 {
-	size_t size = 1024;
-	DynamicJsonDocument docJson(size);
-	char json[1024];
-	docJson[KEY_TEMP] = temp;
-	docJson[KEY_HUMI] = humi;
-	docJson[KEY_PRESSURE] = pressure;
-	serializeJson(docJson, json);
-	//Sprintln(String(topic) + " : " + String(json));
-	hcrl.MQTT.publish(topic, json);
+    size_t size = 1024;
+    DynamicJsonDocument docJson(size);
+    char json[1024];
+    docJson[KEY_TEMP] = temp;
+    docJson[KEY_HUMI] = humi;
+    docJson[KEY_PRESSURE] = pressure;
+    serializeJson(docJson, json);
+    //Sprintln(String(topic) + " : " + String(json));
+    hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -311,13 +311,13 @@ void PubENV(const char *topic)
 */
 void PubPIR(const char *topic)
 {
-	size_t size = 1024;
-	DynamicJsonDocument docJson(size);
-	char json[1024];
-	docJson[KEY_STATUS] = motionStatus;
-	serializeJson(docJson, json);
-	//Sprintln(String(topic) + " : " + String(json));
-	hcrl.MQTT.publish(topic, json);
+    size_t size = 1024;
+    DynamicJsonDocument docJson(size);
+    char json[1024];
+    docJson[KEY_STATUS] = motionStatus;
+    serializeJson(docJson, json);
+    //Sprintln(String(topic) + " : " + String(json));
+    hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -327,13 +327,13 @@ void PubPIR(const char *topic)
 */
 void PubLight(const char *topic, uint8_t lightStatus)
 {
-	size_t size = 1024;
-	DynamicJsonDocument docJson(size);
-	char json[1024];
-	docJson[KEY_STATUS] = lightStatus;
-	serializeJson(docJson, json);
-	//Sprintln(String(topic) + " : " + String(json));
-	hcrl.MQTT.publish(topic, json);
+    size_t size = 1024;
+    DynamicJsonDocument docJson(size);
+    char json[1024];
+    docJson[KEY_STATUS] = lightStatus;
+    serializeJson(docJson, json);
+    //Sprintln(String(topic) + " : " + String(json));
+    hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -344,14 +344,14 @@ void PubLight(const char *topic, uint8_t lightStatus)
 */
 void PubAir(const char *topic)
 {
-	size_t size = 1024;
-	DynamicJsonDocument docJson(size);
-	char json[1024];
-	docJson[KEY_STATUS] = airStatus;
-	docJson[KEY_TEMP] = airTemp;
-	serializeJson(docJson, json);
-	//Sprintln(String(topic) + " : " + String(json));
-	hcrl.MQTT.publish(topic, json);
+    size_t size = 1024;
+    DynamicJsonDocument docJson(size);
+    char json[1024];
+    docJson[KEY_STATUS] = airStatus;
+    docJson[KEY_TEMP] = airTemp;
+    serializeJson(docJson, json);
+    //Sprintln(String(topic) + " : " + String(json));
+    hcrl.MQTT.publish(topic, json);
 }
 
 /*
@@ -362,12 +362,12 @@ void PubAir(const char *topic)
 */
 void PubFan(const char *topic)
 {
-	size_t size = 1024;
-	DynamicJsonDocument docJson(size);
-	char json[1024];
-	docJson[KEY_STATUS] = fanStatus;
-	docJson[KEY_LEVEL] = fanLevel;
-	serializeJson(docJson, json);
-	//Sprintln(String(topic) + " : " + String(json));
-	hcrl.MQTT.publish(topic, json);
+    size_t size = 1024;
+    DynamicJsonDocument docJson(size);
+    char json[1024];
+    docJson[KEY_STATUS] = fanStatus;
+    docJson[KEY_LEVEL] = fanLevel;
+    serializeJson(docJson, json);
+    //Sprintln(String(topic) + " : " + String(json));
+    hcrl.MQTT.publish(topic, json);
 }

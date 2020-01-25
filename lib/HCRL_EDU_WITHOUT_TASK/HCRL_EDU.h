@@ -11,8 +11,12 @@
 #include "millisDelay/millisDelay.h"
 #include "SENSORS/LED_STRIP/stripClass.h"
 #include "JSON/ArduinoJson.h"
-#include "UI/UI.h"
-#include "UI/UI.cpp"
+#include "UI.h"
+#include "UI.cpp"
+#include "JSON/jsonwrapper.hpp"
+
+using jsonWrapper = json;
+
 class HCRL_EDU
 {
 private:
@@ -23,6 +27,7 @@ public:
 
     wifiWrapper WiFi;
     mqttWrapper MQTT;
+    jsonWrapper JSON;
 
     UI Ui;
 
