@@ -74,8 +74,8 @@ struct Node
   {
   };
   Sub_node sub[MAX_SUB];
-  char *titlePic;
-  char *titlePic_Hover;
+  char *titlePic = "/blank.png";
+  char *titlePic_Hover = "/blank.png";
   String title_1st;
   String title_2nd;
   uint16_t title1stColor = WHITE;
