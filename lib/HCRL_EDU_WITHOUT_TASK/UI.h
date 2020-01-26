@@ -164,7 +164,7 @@ private:
   //
   struct Menu
   {
-    const String BACK = "  Back  ";
+    const String BACK = "  Main  ";
     const String OK = "   Ok   ";
     const String NEXT = "  Next  ";
     const String PLUS = "   ++   ";
