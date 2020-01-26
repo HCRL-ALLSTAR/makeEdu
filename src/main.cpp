@@ -149,6 +149,7 @@ void loop()
 
     fanLevel = hcrl.Ui.get_node_data(0);
 
+
     if (fanLevel > 0) //on
     {
         fanStatus = 1;
@@ -192,6 +193,7 @@ void loop()
             PubLight(PUB_LIGHT_1, light_1Status);
             PubLight(PUB_LIGHT_2, light_2Status);
             PubLight(PUB_LIGHT_3, light_3Status);
+            
         }
 
         pubDelay.repeat();
@@ -246,14 +248,6 @@ void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t
     lightRGB[1] = doc[KEY_G];
     lightRGB[2] = doc[KEY_B];
     hcrl.Ui.set_node_data(lightIndex, *lightStatus);
-    if (lightStatus == 0)
-    {
-        hcrl.RGB_LED.setPixelsColor(lightIndex, 0, 0, 0);
-    }
-    else
-    {
-        hcrl.RGB_LED.setPixelsColor(lightIndex, lightRGB[0], lightRGB[1], lightRGB[2]);
-    }
 }
 
 /*

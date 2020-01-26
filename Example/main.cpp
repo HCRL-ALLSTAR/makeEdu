@@ -159,13 +159,12 @@ void loop()
 	}
 	if (ledRand.justFinished())
 	{
-		for (int i = 0; i < RGB_LED_PIXELS; i++)
-		{
-			hcrl.RGB_LED.setPixelsColor(i, random(255), random(255), random(255));
-		}
+		hcrl.RGB_LED.setPixelsColor(0, light_1RGB[0], light_2RGB[1], light_3RGB[2]);
+		hcrl.RGB_LED.setPixelsColor(0, light_2RGB[0], light_2RGB[1], light_2RGB[2]);
+		hcrl.RGB_LED.setPixelsColor(0, light_3RGB[0], light_3RGB[1], light_3RGB[2]);
 		for (int i = 0; i < RGB_STRIP_PIXELS; i++)
 		{
-			hcrl.RGB_STRIP.setPixelsColor(i, random(255), random(255), random(255));
+			hcrl.RGB_STRIP.setPixelsColor(i, (uint8_t)random(254), (uint8_t)random(254), (uint8_t)random(254));
 		}
 		ledRand.repeat();
 	}
@@ -247,6 +246,14 @@ void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t
 	lightRGB[1] = doc[KEY_G];
 	lightRGB[2] = doc[KEY_B];
 	hcrl.Ui.set_node_data(lightIndex, *lightStatus);
+	if (lightStatus == 0)
+	{
+		hcrl.RGB_LED.setPixelsColor(lightIndex, 0, 0, 0);
+	}
+	else
+	{
+		hcrl.RGB_LED.setPixelsColor(lightIndex, lightRGB[0], lightRGB[1], lightRGB[2]);
+	}
 }
 
 /*

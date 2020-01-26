@@ -27,6 +27,8 @@ class HCRL_EDU
 {
 private:
     /* data */
+    millisDelay updateDelay;
+
 public:
     HCRL_EDU(/* args */);
     ~HCRL_EDU();
@@ -42,11 +44,13 @@ public:
     envWrapper ENV;
     rgbLedWrapper RGB_LED;
     rgbStripWrapper RGB_STRIP;
+
     void update();
 };
 
 HCRL_EDU::HCRL_EDU(/* args */)
 {
+    this->updateDelay.start(Sec2MS(3));
 }
 
 HCRL_EDU::~HCRL_EDU()
@@ -55,8 +59,13 @@ HCRL_EDU::~HCRL_EDU()
 
 void HCRL_EDU::update()
 {
-    RGB_LED.update();
-    RGB_STRIP.update();
+    if (updateDelay.justFinished())
+    {
+        RGB_LED.update();
+        RGB_STRIP.update();
+        updateDelay.repeat();
+    }
+
     MQTT.update();
     Ui.set_wifi_ssid(WiFi.getSSID());
     Ui.set_wifi_status(WiFi.getStatus());
