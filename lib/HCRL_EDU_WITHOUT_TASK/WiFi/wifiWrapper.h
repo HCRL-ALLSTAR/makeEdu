@@ -45,7 +45,7 @@ void wifiWrapper::begin(const char *SSID, const char *PASSWORD)
     {
         Sprint("=");
         TaskDelay(200);
-        if (millis() - startTime > 10000)
+        if (millis() - startTime > Sec2MS(10))
         {
             ESP.restart();
         }
