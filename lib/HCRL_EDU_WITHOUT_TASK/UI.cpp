@@ -535,6 +535,10 @@ void UI::cont_panel()
   }
   else if (node[c_panel.index].type == AIR)
   {
+    if (node[c_panel.index].data != node[c_panel.index].last_data)
+    {
+      this->node[c_panel.index].last_data = node[c_panel.index].data;
+    }
     if (node[c_panel.index].temp_data != node[c_panel.index].last_temp_data)
     {
 
@@ -806,20 +810,24 @@ int8_t UI::get_node_temp(int index)
 void UI::set_node_data(int index, uint8_t newData)
 {
   this->node[index].data = newData;
-  this->node[index].last_data = -1;
-  this->c_panel.lastIndex = -1;
-  this->node[index].last_temp_data = -1;
-  // Lcd.fillRect(0, 0, 320, 218, backgroundColor);
-  // if (tick_frame())
-  // {
-  // main();
-  // }
-  // framerate_update();
+  if (index == c_panel.index && node[index].last_data != newData && node[index].type == AIR)
+  {
+    this->c_panel.lastIndex = -1;
+    this->node[index].last_temp_data = -1;
+  }
+  else if (node[index].type == FAN && newData == 0 && node[index].last_data != 0)
+  {
+    this->c_panel.lastIndex = -1;
+  }
+  else if (node[index].type == FAN && newData != 0 && node[index].last_data == 0)
+  {
+    this->c_panel.lastIndex = -1;
+  }
 }
 void UI::set_node_temp(int index, uint8_t newTemp)
 {
   this->node[index].temp_data = newTemp;
-  this->node[index].last_data = -1;
-  this->c_panel.lastIndex = -1;
-  this->node[index].last_temp_data = -1;
+//   this->node[index].last_data = -1;
+//   this->c_panel.lastIndex = -1;
+//   this->node[index].last_temp_data = -1;
 }

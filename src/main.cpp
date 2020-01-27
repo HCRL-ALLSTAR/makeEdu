@@ -66,9 +66,10 @@ int data[6] = {0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp
 void setup()
 {
     Serial.begin(115200);
-    hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
-    // hcrl.WiFi.begin();
-    hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
+    hcrl.WiFi.begin("WIFIIV", "0245760494");
+    hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
+    // hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
+    // hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
     hcrl.MQTT.startSubscribe("/test");
     hcrl.MQTT.startSubscribe(SUB_AIR);
     hcrl.MQTT.startSubscribe(SUB_FAN);
@@ -76,14 +77,7 @@ void setup()
     hcrl.MQTT.startSubscribe(SUB_LIGHT_2);
     hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
 
-    //Get Status
-    Sprintln("WiFi SSID : " + String(hcrl.WiFi.getSSID()));
-    Sprintln("WiFi Status : " + String(hcrl.WiFi.getStatus()));
-
-    Sprintln("MQTT Server : " + String(hcrl.MQTT.getServer()));
-    Sprintln("MQTT Port : " + String(hcrl.MQTT.getPort()));
-    Sprintln("MQTT Username : " + String(hcrl.MQTT.getUsername()));
-    Sprintln("MQTT Status : " + String(hcrl.MQTT.getStatus()));
+    delay(100);
 
     hcrl.Ui.begin();
 
@@ -123,13 +117,18 @@ void setup()
     ledRand.start(Sec2MS(1));
 
     hcrl.ANGLE.begin();
-    hcrl.ENV.begin();
     hcrl.MOTION.begin();
+    hcrl.ENV.begin();
+
     hcrl.RGB_LED.begin();
     hcrl.RGB_LED.setBrightness(10);
-
     hcrl.RGB_STRIP.begin();
     hcrl.RGB_STRIP.setBrightness(10);
+
+    hcrl.LED.begin();
+    hcrl.STRIP.begin();
+    hcrl.LED.setBrightness(10);
+    hcrl.STRIP.setBrightness(10);
 }
 
 void loop()
@@ -158,17 +157,18 @@ void loop()
     {
         fanStatus = 0;
     }
-    if (ledRand.justFinished())
+    for (uint8_t i = 0; i < STRIP_NUM; i++)
     {
-        hcrl.RGB_LED.setPixelsColor(0, light_1RGB[0], light_2RGB[1], light_3RGB[2]);
-        hcrl.RGB_LED.setPixelsColor(0, light_2RGB[0], light_2RGB[1], light_2RGB[2]);
-        hcrl.RGB_LED.setPixelsColor(0, light_3RGB[0], light_3RGB[1], light_3RGB[2]);
-        for (int i = 0; i < RGB_STRIP_PIXELS; i++)
-        {
-            hcrl.RGB_STRIP.setPixelsColor(i, (uint8_t)random(254), (uint8_t)random(254), (uint8_t)random(254));
-        }
-        ledRand.repeat();
+        hcrl.STRIP.set_RGB(i, 200, 0, 200);
+        hcrl.STRIP.set_status(i, 1);
     }
+
+    hcrl.LED.set_RGB(0, light_1RGB[0], light_1RGB[1], light_1RGB[2]);
+    hcrl.LED.set_RGB(1, light_2RGB[0], light_2RGB[1], light_2RGB[2]);
+    hcrl.LED.set_RGB(2, light_3RGB[0], light_3RGB[1], light_3RGB[2]);
+    hcrl.LED.set_status(0, light_1Status);
+    hcrl.LED.set_status(1, light_2Status);
+    hcrl.LED.set_status(2, light_3Status);
 
     if (pubDelay.justFinished()) //m5->Node-red
     {
@@ -208,26 +208,31 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
 {
     Paylaod[Length] = '\0';
     String topic_str = Topic, payload_str = (char *)Paylaod;
-    Serial.println("[" + topic_str + "]: " + payload_str);
+    Serial.print("[" + topic_str + "]: " + payload_str);
     if (topic_str.equals(SUB_LIGHT_1))
     {
         SubLight(Paylaod, Length, &light_1Status, light_1RGB, LIGHT_1_INDEX);
+        Serial.printf(" Successfully set %d %d %d\n", light_1RGB[0], light_1RGB[1], light_1RGB[2]);
     }
     else if (topic_str.equals(SUB_LIGHT_2))
     {
         SubLight(Paylaod, Length, &light_2Status, light_2RGB, LIGHT_2_INDEX);
+        Serial.printf(" Successfully set %d %d %d\n", light_2RGB[0], light_2RGB[1], light_2RGB[2]);
     }
     else if (topic_str.equals(SUB_LIGHT_3))
     {
         SubLight(Paylaod, Length, &light_3Status, light_3RGB, LIGHT_3_INDEX);
+        Serial.printf(" Successfully set %d %d %d\n", light_3RGB[0], light_3RGB[1], light_3RGB[2]);
     }
     else if (topic_str.equals(SUB_AIR))
     {
         SubAir(Paylaod, Length);
+        Serial.println("");
     }
     else if (topic_str.equals(SUB_FAN))
     {
         SubFan(Paylaod, Length);
+        Serial.println("");
     }
 }
 
