@@ -52,7 +52,6 @@ uint8_t fanStatus;
 uint8_t fanLevel;
 
 millisDelay pubDelay;
-millisDelay ledRand;
 HCRL_EDU hcrl;
 
 #define FAN_INDEX 0
@@ -114,16 +113,9 @@ void setup()
     hcrl.Ui.node_setTitlePic(LIGHT_3_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
 
     pubDelay.start(Sec2MS(3));
-    ledRand.start(Sec2MS(1));
-
     hcrl.ANGLE.begin();
     hcrl.MOTION.begin();
     hcrl.ENV.begin();
-
-    hcrl.RGB_LED.begin();
-    hcrl.RGB_LED.setBrightness(10);
-    hcrl.RGB_STRIP.begin();
-    hcrl.RGB_STRIP.setBrightness(10);
 
     hcrl.LED.begin();
     hcrl.STRIP.begin();
@@ -200,7 +192,6 @@ void loop()
     }
 
     hcrl.update();
-    randomSeed(millis());
 }
 
 // Default Callback Function

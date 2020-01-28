@@ -7,10 +7,6 @@
 #include "SENSORS/ANGLE/angleClass.h"
 #include "SENSORS/ENV/envClass.h"
 #include "SENSORS/PIR/pirClass.h"
-
-#include "SENSORS/LED_RGB/rgbClass.h"
-#include "SENSORS/LED_STRIP/stripClass.h"
-
 #include "SENSORS/RGB/RGBLed/RGBLed.h"
 #include "SENSORS/RGB/RGBStrip/RGBStrip.h"
 
@@ -25,8 +21,6 @@ using uiWrapper = UI;
 using angleWrapper = angleClass;
 using pirWrapper = pirClass;
 using envWrapper = envClass;
-using rgbLedWrapper = rgbLedClass;
-using rgbStripWrapper = rgbStripClass;
 
 class HCRL_EDU
 {
@@ -48,9 +42,6 @@ public:
     pirWrapper MOTION;
 
     envWrapper ENV;
-
-    rgbLedWrapper RGB_LED;
-    rgbStripWrapper RGB_STRIP;
 
     RGBStrip STRIP;
     RGBLed LED;
