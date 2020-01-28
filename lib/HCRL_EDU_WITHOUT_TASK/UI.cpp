@@ -555,6 +555,13 @@ void UI::cont_panel()
       this->node[c_panel.index].last_temp_data = node[c_panel.index].temp_data;
     }
   }
+  else if(node[c_panel.index].type == LIGHT)
+  {
+    if (node[c_panel.index].data != node[c_panel.index].last_data)
+    {
+      this->node[c_panel.index].last_data = node[c_panel.index].data;
+    }
+  }
 }
 
 void UI::sett_panel()
@@ -620,6 +627,7 @@ void UI::batteryUpdate()
 {
   Lcd.drawRoundRect(270, 8, 38, 17, 5, m.battFillColor);
   uint8_t currentLevel = batt.getLevel();
+  if(currentLevel > 100) currentLevel = 100;
   if (currentLevel <= 25)
   {
     this->m.battFillColor = m.lowBattFillColor;
