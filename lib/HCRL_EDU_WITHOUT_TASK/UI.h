@@ -181,6 +181,7 @@ private:
     bool leftBtn_enable = false;
     bool midBtn_enable = true;
     bool rightBtn_enable = true;
+    uint8_t cursor = 0;
     String leftText = BACK;
     String midText = OK;
     String rightText = NEXT;
@@ -249,6 +250,8 @@ private:
     uint8_t select = 0b100;
     uint8_t lastSel = 0b000;
     String title = "Settings";
+    bool change = true;
+    uint8_t st_data[3] ={1,1,0};
   };
   Sett_panel st_panel;
   void sett_panel();

@@ -94,7 +94,6 @@ void UI::update()
     }
     if (panel == SETT)
     {
-
       this->panel = MAIN;
     }
   }
@@ -182,7 +181,13 @@ void UI::update()
     }
     else if (panel == SETT)
     {
+      if(st_panel.st_data[m.cursor] == 0)
+        this->st_panel.st_data[m.cursor] = 1;
+      else if(st_panel.st_data[m.cursor] == 1)
+        this->st_panel.st_data[m.cursor] = 0;
+      this->st_panel.change = true;
     }
+    
   }
 
   if (BtnC.pressedFor(RETURN_MS))
@@ -225,6 +230,13 @@ void UI::update()
       {
         this->node[c_panel.index].temp_data += 1;
       }
+    }
+    if(panel == SETT)
+    {
+      this->m.cursor += 1;
+      if(m.cursor == 3)
+        this->m.cursor = 0;
+      this->st_panel.change = true;
     }
   }
   //main
@@ -575,6 +587,152 @@ void UI::sett_panel()
   Lcd.setCursor(10, 10);
   Lcd.setTextSize(st_panel.titleSize);
   Lcd.print(st_panel.title);
+  if(st_panel.change == true)
+  {
+    Lcd.fillRect(0,42,320,168,BLACK);
+    if(m.cursor == 0)
+    {
+      Lcd.fillRect(0,42,320,56,BLUE);
+      Lcd.drawCircle(25,70,15,WHITE);
+      Lcd.setTextColor(WHITE);
+      Lcd.setCursor(50, 63);
+      Lcd.setTextSize(2);
+      Lcd.print("Brightness");
+      Lcd.drawCircle(25,126,15,WHITE);
+      Lcd.setTextColor(WHITE);
+      Lcd.setCursor(50, 118);
+      Lcd.setTextSize(2);
+      Lcd.print("RGB_Strip");
+      Lcd.drawCircle(25,182,15,WHITE);
+      if(st_panel.st_data[0] == 1) //brightness
+      {
+        Lcd.fillCircle(25,70,12,WHITE);
+      }
+      else if(st_panel.st_data[0] == 0)
+      {
+        Lcd.fillCircle(25,70,12,BLUE);
+      }
+      if(st_panel.st_data[1] == 1) //RGB
+      {
+        Lcd.fillCircle(25,126,12,WHITE);
+      }
+      else if(st_panel.st_data[1] == 0)
+      {
+        Lcd.fillCircle(25,126,12,BLACK);
+      }
+      if(st_panel.st_data[2] == 1)
+      {
+        Lcd.fillCircle(25,182,12,WHITE);
+        Lcd.setTextColor(WHITE);
+        Lcd.setCursor(50, 173);
+        Lcd.setTextSize(2);
+        Lcd.print("Theme : LIGHT");
+      }
+      else if(st_panel.st_data[2] == 0)
+      {
+        Lcd.fillCircle(25,182,12,BLACK);
+        Lcd.setTextColor(WHITE);
+        Lcd.setCursor(50, 173);
+        Lcd.setTextSize(2);
+        Lcd.print("Theme : DARK");
+      }
+    }
+    else if(m.cursor == 1)
+    {
+      Lcd.fillRect(0,98,320,56,BLUE);
+      Lcd.drawCircle(25,70,15,WHITE);
+      Lcd.setTextColor(WHITE);
+      Lcd.setCursor(50, 63);
+      Lcd.setTextSize(2);
+      Lcd.print("Brightness");
+      Lcd.drawCircle(25,126,15,WHITE);
+      Lcd.setTextColor(WHITE);
+      Lcd.setCursor(50, 118);
+      Lcd.setTextSize(2);
+      Lcd.print("RGB_Strip");
+      Lcd.drawCircle(25,182,15,WHITE);
+      if(st_panel.st_data[0] == 1) //brightness
+      {
+        Lcd.fillCircle(25,70,12,WHITE);
+      }
+      else if(st_panel.st_data[0] == 0)
+      {
+        Lcd.fillCircle(25,70,12,BLACK);
+      }
+      if(st_panel.st_data[1] == 1) //RGB
+      {
+        Lcd.fillCircle(25,126,12,WHITE);
+      }
+      else if(st_panel.st_data[1] == 0)
+      {
+        Lcd.fillCircle(25,126,12,BLUE);
+      }
+      if(st_panel.st_data[2] == 1)
+      {
+        Lcd.fillCircle(25,182,12,WHITE);
+        Lcd.setTextColor(WHITE);
+        Lcd.setCursor(50, 173);
+        Lcd.setTextSize(2);
+        Lcd.print("Theme : LIGHT");
+      }
+      else if(st_panel.st_data[2] == 0)
+      {
+        Lcd.fillCircle(25,182,12,BLACK);
+        Lcd.setTextColor(WHITE);
+        Lcd.setCursor(50, 173);
+        Lcd.setTextSize(2);
+        Lcd.print("Theme : DARK");
+      }
+    }
+    else if(m.cursor == 2)
+    {
+      Lcd.fillRect(0,154,320,56,BLUE);
+      Lcd.drawCircle(25,70,15,WHITE);
+      Lcd.setTextColor(WHITE);
+      Lcd.setCursor(50, 63);
+      Lcd.setTextSize(2);
+      Lcd.print("Brightness");
+      Lcd.drawCircle(25,126,15,WHITE);
+      Lcd.setTextColor(WHITE);
+      Lcd.setCursor(50, 118);
+      Lcd.setTextSize(2);
+      Lcd.print("RGB_Strip");
+      Lcd.drawCircle(25,182,15,WHITE);
+      if(st_panel.st_data[0] == 1) //brightness
+      {
+        Lcd.fillCircle(25,70,12,WHITE);
+      }
+      else if(st_panel.st_data[0] == 0)
+      {
+        Lcd.fillCircle(25,70,12,BLACK);
+      }
+      if(st_panel.st_data[1] == 1) //RGB
+      {
+        Lcd.fillCircle(25,126,12,WHITE);
+      }
+      else if(st_panel.st_data[1] == 0)
+      {
+        Lcd.fillCircle(25,126,12,BLACK);
+      }
+      if(st_panel.st_data[2] == 1)
+      {
+        Lcd.fillCircle(25,182,12,WHITE);
+        Lcd.setTextColor(WHITE);
+        Lcd.setCursor(50, 173);
+        Lcd.setTextSize(2);
+        Lcd.print("Theme : LIGHT");
+      }
+      else if(st_panel.st_data[2] == 0)
+      {
+        Lcd.fillCircle(25,182,12,BLUE);
+        Lcd.setTextColor(WHITE);
+        Lcd.setCursor(50, 173);
+        Lcd.setTextSize(2);
+        Lcd.print("Theme : DARK");
+      }
+    }
+    st_panel.change = false;
+  }
 }
 
 void UI::menu_disp()
