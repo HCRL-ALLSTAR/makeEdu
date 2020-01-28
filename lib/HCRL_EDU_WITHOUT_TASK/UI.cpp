@@ -823,6 +823,10 @@ void UI::set_node_data(int index, uint8_t newData)
   {
     this->c_panel.lastIndex = -1;
   }
+  else if (node[index].type == LIGHT && newData != node[index].last_data && index == c_panel.index)
+  {
+    this->c_panel.lastIndex = -1;
+  }
 }
 void UI::set_node_temp(int index, uint8_t newTemp)
 {
