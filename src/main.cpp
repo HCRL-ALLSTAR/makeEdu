@@ -8,12 +8,14 @@
 #define PUB_FAN "M5/fan"
 #define PUB_ENV "M5/env"
 #define PUB_PIR "M5/pir"
+#define PUB_STRIP "M5/Strip"
 
 #define SUB_LIGHT_1 "Node/light1"
 #define SUB_LIGHT_2 "Node/light2"
 #define SUB_LIGHT_3 "Node/light3"
 #define SUB_AIR "Node/air"
 #define SUB_FAN "Node/fan"
+#define SUB_STRIP "Node/Strip"
 
 #define KEY_TEMP "temp"
 #define KEY_HUMI "humi"
@@ -71,7 +73,7 @@ void setup()
     // hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
 
     hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
-    
+
     hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
     hcrl.MQTT.startSubscribe("/test");
     hcrl.MQTT.startSubscribe(SUB_AIR);
@@ -154,7 +156,7 @@ void loop()
     {
         fanStatus = 0;
     }
-    if(hcrl.Ui.get_strip_data() == 1)
+    if (hcrl.Ui.get_strip_data() == 1)
     {
         for (uint8_t i = 0; i < STRIP_NUM; i++)
         {
@@ -162,7 +164,7 @@ void loop()
             hcrl.STRIP.set_status(i, 1);
         }
     }
-    else if(hcrl.Ui.get_strip_data() == 0)
+    else if (hcrl.Ui.get_strip_data() == 0)
     {
         for (uint8_t i = 0; i < STRIP_NUM; i++)
         {
@@ -201,9 +203,8 @@ void loop()
             PubLight(PUB_LIGHT_1, light_1Status);
             PubLight(PUB_LIGHT_2, light_2Status);
             PubLight(PUB_LIGHT_3, light_3Status);
-            
         }
-        if(data[6] != RGB_Strip)
+        if (data[6] != RGB_Strip)
         {
             data[6] = RGB_Strip;
             PubStrip("M5/Strip");
