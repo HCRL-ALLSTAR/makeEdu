@@ -29,6 +29,8 @@
 void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *, uint8_t lightIndex);
 void SubAir(byte *payload, unsigned int length);
 void SubFan(byte *payload, unsigned int length);
+void SUbStrip(byte *payload, unsigned int length);
+
 void PubENV(const char *topic);
 void PubPIR(const char *topic);
 void PubLight(const char *topic, uint8_t lightStatu);
@@ -51,9 +53,13 @@ uint16_t light_3RGB[3];
 
 uint8_t airStatus;
 uint8_t airTemp;
+
 uint8_t fanStatus;
 uint8_t fanLevel;
+
 uint8_t RGB_Strip;
+
+uint8_t rgbStripStatus;
 
 millisDelay pubDelay;
 HCRL_EDU hcrl;
@@ -207,7 +213,7 @@ void loop()
         if (data[6] != RGB_Strip)
         {
             data[6] = RGB_Strip;
-            PubStrip("M5/Strip");
+            PubStrip(PUB_STRIP);
         }
 
         pubDelay.repeat();
@@ -399,4 +405,16 @@ void PubStrip(const char *topic)
     docJson[KEY_STATUS] = RGB_Strip;
     serializeJson(docJson, json);
     hcrl.MQTT.publish(topic, json);
+}
+
+void SUbStrip(byte *payload, unsigned int length)
+{
+    StaticJsonDocument<1024> doc;
+    deserializeJson(doc, payload, length);
+    rgbStripStatus = doc[KEY_STATUS];
+    /*
+        insert set method here
+    
+    */
+    
 }
