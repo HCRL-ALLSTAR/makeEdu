@@ -74,7 +74,7 @@ int data[7] = {0, 0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp , 6-rg
 
 void setup()
 {
-    hcrl.Ui.begin();
+    Serial.begin(115200);
     
     hcrl.WiFi.begin("WIFIIV", "0245760494");
     hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
@@ -90,6 +90,8 @@ void setup()
     hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
 
     delay(100);
+
+    hcrl.Ui.begin();
 
     //UI
     hcrl.Ui.node_init(5);
