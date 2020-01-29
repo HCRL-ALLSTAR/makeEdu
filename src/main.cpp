@@ -74,13 +74,14 @@ int data[7] = {0, 0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp , 6-rg
 
 void setup()
 {
-    // Serial.begin(115200);
-    // hcrl.WiFi.begin("WIFIIV", "0245760494");
-    // hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
+    hcrl.Ui.begin();
+    
+    hcrl.WiFi.begin("WIFIIV", "0245760494");
+    hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
 
-    hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
+    // hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
+    // hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
 
-    hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
     hcrl.MQTT.startSubscribe("/test");
     hcrl.MQTT.startSubscribe(SUB_AIR);
     hcrl.MQTT.startSubscribe(SUB_FAN);
@@ -89,8 +90,6 @@ void setup()
     hcrl.MQTT.startSubscribe(SUB_LIGHT_3);
 
     delay(100);
-
-    hcrl.Ui.begin();
 
     //UI
     hcrl.Ui.node_init(5);

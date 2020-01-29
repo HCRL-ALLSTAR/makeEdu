@@ -55,10 +55,12 @@
 #include "SD.h"
 
 #include "Display.h"
-#include "Display.cpp"
 #include "utility/Config.h"
 #include "utility/Button.h"
 #include "utility/Battery.h"
+#include "utility/Power.h"
+#include "utility/CommUtil.h"
+
 #include "Free_Fonts.h"
 
 #define MAX_NODE 32
@@ -106,7 +108,7 @@ public:
   Display Lcd = Display();
 
   //Battery
-  Battery batt = Battery();
+  POWER power;
 
   //Node
   uint8_t node_size;
@@ -151,11 +153,12 @@ private:
   //
   unsigned long long time, counter, return_c, return_ac;
   bool isInited;
-  uint8_t idealRefreshRate = 5;
-  uint8_t refreshRate = 5;
+  uint8_t idealRefreshRate = 60;
+  uint8_t refreshRate = 60;
   uint8_t period; // 1000/refreshRate miliseconds per frame
   uint16_t backgroundColor = BLACK;
   int fps = 0;
+  bool refill = false;
   //
   String wifi_ssid, mqtt_ip, wifi_status, mqtt_status;
   String last_wifi_ssid, last_mqtt_ip, last_wifi_status, last_mqtt_status;
@@ -163,6 +166,8 @@ private:
   float last_temp = -1, last_humid = -1, last_pa = -1;
   int motion;
   int last_motion = -1;
+  int battery = 0;
+  bool revert = false;
   //
   struct Menu
   {
@@ -175,6 +180,7 @@ private:
     uint16_t lineColor = WHITE;
     uint16_t battFillColor = WHITE;
     uint16_t defaultBattFillColor = WHITE;
+    uint16_t charingBattFillColor = GREEN;
     uint16_t lowBattFillColor = RED;
     int8_t lastLevel = -1;
     bool leftBtn_visible = true;
@@ -253,7 +259,7 @@ private:
     uint8_t lastSel = 0b000;
     String title = "Settings";
     bool change = true;
-    uint8_t st_data[3] ={1,1,0};
+    uint8_t st_data[3] ={0,0,0};
   };
   Sett_panel st_panel;
   void sett_panel();

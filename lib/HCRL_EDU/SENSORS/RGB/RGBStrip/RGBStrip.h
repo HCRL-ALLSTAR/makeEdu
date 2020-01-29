@@ -41,7 +41,8 @@ void RGBStrip::begin(){
     }
 }
 
-void RGBStrip::update(){
+void RGBStrip::update()
+{
     if(began){
         for(uint8_t i = 0; i<STRIP_NUM; i++){
             if(st[i] == 0){

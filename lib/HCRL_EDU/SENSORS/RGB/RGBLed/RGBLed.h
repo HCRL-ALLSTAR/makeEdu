@@ -42,7 +42,8 @@ void RGBLed::begin()
     pixel_LED.show();
 }
 
-void RGBLed::update(){
+void RGBLed::update()
+{
     if (began){
         for (uint8_t i = 0; i < LED_NUM; i++)
         {

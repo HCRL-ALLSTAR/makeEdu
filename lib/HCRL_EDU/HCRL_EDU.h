@@ -60,13 +60,6 @@ HCRL_EDU::~HCRL_EDU()
 
 void HCRL_EDU::update()
 {
-    if (updateDelay.justFinished())
-    {
-        // RGB_LED.update();
-        // RGB_STRIP.update();
-        updateDelay.repeat();
-    }
-
     STRIP.update();
     LED.update();
     MQTT.update();
@@ -80,5 +73,4 @@ void HCRL_EDU::update()
     Ui.set_motion(MOTION.getValue());
     Ui.update();
 }
-
 #endif

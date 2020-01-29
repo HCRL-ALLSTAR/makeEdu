@@ -14,7 +14,6 @@ UI::UI() : isInited(0)
 //init UI
 void UI::begin(bool LCDEnable, bool SDEnable, bool SerialEnable)
 {
-  //xTaskCreate(updateCode, "Ui update task", 4096, this, 10, &updateHandle);
   // Correct init once
   if (isInited == true)
   {
@@ -28,7 +27,8 @@ void UI::begin(bool LCDEnable, bool SDEnable, bool SerialEnable)
   // UART
   if (SerialEnable == true)
   {
-    Serial.begin(115200);
+    if(!Serial)
+      Serial.begin(115200);
     Serial.flush();
     delay(50);
     Serial.print("M5Stack initializing...");
@@ -57,7 +57,7 @@ void UI::begin(bool LCDEnable, bool SDEnable, bool SerialEnable)
     Serial.println("OK");
   }
 
-  batt.Begin();
+  power.begin();
 
   this->period = 1000 / refreshRate;
 }
@@ -65,7 +65,7 @@ void UI::begin(bool LCDEnable, bool SDEnable, bool SerialEnable)
 //update all UI components
 void UI::update()
 {
-  //Button update
+  // //Button update
   BtnA.read();
   BtnB.read();
   BtnC.read();
@@ -250,7 +250,7 @@ void UI::update()
 
   //Setting Update
 
-  //frame control
+  // frame control
   framerate_update();
 }
 
@@ -410,13 +410,18 @@ void UI::stat_panel()
     this->last_motion = motion;
   }
   Lcd.printf("%d\n", motion);
-  Lcd.setTextColor(CYAN);
+  if (power.isCharging())
+    Lcd.setTextColor(GREEN);
+  else
+    Lcd.setTextColor(CYAN);
   Lcd.printf(" Battery Level: ");
-  if (batt.getLevel() != m.lastLevel)
+  if (power.getBatteryLevel() != m.lastLevel)
   {
     Lcd.fillRect(Lcd.getCursorX(), Lcd.getCursorY(), 200, 20, backgroundColor);
   }
-  Lcd.printf("%d\n", batt.getLevel());
+  Lcd.printf("%d ", power.getBatteryLevel());
+  if (power.isCharging())
+    Lcd.printf("Charge\n");
 }
 
 void UI::cont_panel()
@@ -594,49 +599,49 @@ void UI::sett_panel()
   Lcd.print(st_panel.title);
   if(st_panel.change == true)
   {
-    Lcd.fillRect(0,42,320,168,BLACK);
+    Lcd.fillRect(0,42,320,168,backgroundColor);
     if(m.cursor == 0)
     {
-      Lcd.fillRect(0,42,320,56,BLUE);
-      Lcd.drawCircle(25,70,15,WHITE);
-      Lcd.setTextColor(WHITE);
+      Lcd.fillRect(0,42,320,56,st_panel.selFillColor);
+      Lcd.drawCircle(25,70,15,st_panel.fillColor);
+      Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 63);
       Lcd.setTextSize(2);
       Lcd.print("Brightness");
-      Lcd.drawCircle(25,126,15,WHITE);
-      Lcd.setTextColor(WHITE);
+      Lcd.drawCircle(25,126,15,st_panel.fillColor);
+      Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 118);
       Lcd.setTextSize(2);
       Lcd.print("RGB_Strip");
-      Lcd.drawCircle(25,182,15,WHITE);
+      Lcd.drawCircle(25,182,15,st_panel.fillColor);
       if(st_panel.st_data[0] == 1) //brightness
       {
-        Lcd.fillCircle(25,70,12,WHITE);
+        Lcd.fillCircle(25,70,12,st_panel.fillColor);
       }
       else if(st_panel.st_data[0] == 0)
       {
-        Lcd.fillCircle(25,70,12,BLUE);
+        Lcd.fillCircle(25,70,12,st_panel.selFillColor);
       }
       if(st_panel.st_data[1] == 1) //RGB
       {
-        Lcd.fillCircle(25,126,12,WHITE);
+        Lcd.fillCircle(25,126,12,st_panel.fillColor);
       }
       else if(st_panel.st_data[1] == 0)
       {
-        Lcd.fillCircle(25,126,12,BLACK);
+        Lcd.fillCircle(25,126,12,backgroundColor);
       }
       if(st_panel.st_data[2] == 1)
       {
-        Lcd.fillCircle(25,182,12,WHITE);
-        Lcd.setTextColor(WHITE);
+        Lcd.fillCircle(25,182,12,st_panel.fillColor);
+        Lcd.setTextColor(st_panel.lineColor);
         Lcd.setCursor(50, 173);
         Lcd.setTextSize(2);
         Lcd.print("Theme : LIGHT");
       }
       else if(st_panel.st_data[2] == 0)
       {
-        Lcd.fillCircle(25,182,12,BLACK);
-        Lcd.setTextColor(WHITE);
+        Lcd.fillCircle(25,182,12,backgroundColor);
+        Lcd.setTextColor(st_panel.lineColor);
         Lcd.setCursor(50, 173);
         Lcd.setTextSize(2);
         Lcd.print("Theme : DARK");
@@ -644,46 +649,46 @@ void UI::sett_panel()
     }
     else if(m.cursor == 1)
     {
-      Lcd.fillRect(0,98,320,56,BLUE);
-      Lcd.drawCircle(25,70,15,WHITE);
-      Lcd.setTextColor(WHITE);
+      Lcd.fillRect(0,98,320,56,st_panel.selFillColor);
+      Lcd.drawCircle(25,70,15,st_panel.fillColor);
+      Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 63);
       Lcd.setTextSize(2);
       Lcd.print("Brightness");
-      Lcd.drawCircle(25,126,15,WHITE);
-      Lcd.setTextColor(WHITE);
+      Lcd.drawCircle(25,126,15,st_panel.fillColor);
+      Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 118);
       Lcd.setTextSize(2);
       Lcd.print("RGB_Strip");
-      Lcd.drawCircle(25,182,15,WHITE);
+      Lcd.drawCircle(25,182,15,st_panel.fillColor);
       if(st_panel.st_data[0] == 1) //brightness
       {
-        Lcd.fillCircle(25,70,12,WHITE);
+        Lcd.fillCircle(25,70,12,st_panel.fillColor);
       }
       else if(st_panel.st_data[0] == 0)
       {
-        Lcd.fillCircle(25,70,12,BLACK);
+        Lcd.fillCircle(25,70,12,backgroundColor);
       }
       if(st_panel.st_data[1] == 1) //RGB
       {
-        Lcd.fillCircle(25,126,12,WHITE);
+        Lcd.fillCircle(25,126,12,st_panel.fillColor);
       }
       else if(st_panel.st_data[1] == 0)
       {
-        Lcd.fillCircle(25,126,12,BLUE);
+        Lcd.fillCircle(25,126,12,st_panel.selFillColor);
       }
       if(st_panel.st_data[2] == 1)
       {
-        Lcd.fillCircle(25,182,12,WHITE);
-        Lcd.setTextColor(WHITE);
+        Lcd.fillCircle(25,182,12,st_panel.fillColor);
+        Lcd.setTextColor(st_panel.lineColor);
         Lcd.setCursor(50, 173);
         Lcd.setTextSize(2);
         Lcd.print("Theme : LIGHT");
       }
       else if(st_panel.st_data[2] == 0)
       {
-        Lcd.fillCircle(25,182,12,BLACK);
-        Lcd.setTextColor(WHITE);
+        Lcd.fillCircle(25,182,12,backgroundColor);
+        Lcd.setTextColor(st_panel.lineColor);
         Lcd.setCursor(50, 173);
         Lcd.setTextSize(2);
         Lcd.print("Theme : DARK");
@@ -691,46 +696,46 @@ void UI::sett_panel()
     }
     else if(m.cursor == 2)
     {
-      Lcd.fillRect(0,154,320,56,BLUE);
-      Lcd.drawCircle(25,70,15,WHITE);
-      Lcd.setTextColor(WHITE);
+      Lcd.fillRect(0,154,320,56,st_panel.selFillColor);
+      Lcd.drawCircle(25,70,15,st_panel.fillColor);
+      Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 63);
       Lcd.setTextSize(2);
       Lcd.print("Brightness");
-      Lcd.drawCircle(25,126,15,WHITE);
-      Lcd.setTextColor(WHITE);
+      Lcd.drawCircle(25,126,15,st_panel.fillColor);
+      Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 118);
       Lcd.setTextSize(2);
       Lcd.print("RGB_Strip");
-      Lcd.drawCircle(25,182,15,WHITE);
+      Lcd.drawCircle(25,182,15,st_panel.fillColor);
       if(st_panel.st_data[0] == 1) //brightness
       {
-        Lcd.fillCircle(25,70,12,WHITE);
+        Lcd.fillCircle(25,70,12,st_panel.fillColor);
       }
       else if(st_panel.st_data[0] == 0)
       {
-        Lcd.fillCircle(25,70,12,BLACK);
+        Lcd.fillCircle(25,70,12,backgroundColor);
       }
       if(st_panel.st_data[1] == 1) //RGB
       {
-        Lcd.fillCircle(25,126,12,WHITE);
+        Lcd.fillCircle(25,126,12,st_panel.fillColor);
       }
       else if(st_panel.st_data[1] == 0)
       {
-        Lcd.fillCircle(25,126,12,BLACK);
+        Lcd.fillCircle(25,126,12,backgroundColor);
       }
       if(st_panel.st_data[2] == 1)
       {
-        Lcd.fillCircle(25,182,12,WHITE);
-        Lcd.setTextColor(WHITE);
+        Lcd.fillCircle(25,182,12,st_panel.fillColor);
+        Lcd.setTextColor(st_panel.lineColor);
         Lcd.setCursor(50, 173);
         Lcd.setTextSize(2);
         Lcd.print("Theme : LIGHT");
       }
       else if(st_panel.st_data[2] == 0)
       {
-        Lcd.fillCircle(25,182,12,BLUE);
-        Lcd.setTextColor(WHITE);
+        Lcd.fillCircle(25,182,12,st_panel.selFillColor);
+        Lcd.setTextColor(st_panel.lineColor);
         Lcd.setCursor(50, 173);
         Lcd.setTextSize(2);
         Lcd.print("Theme : DARK");
@@ -789,9 +794,16 @@ void UI::menu_disp()
 void UI::batteryUpdate()
 {
   Lcd.drawRoundRect(270, 8, 38, 17, 5, m.battFillColor);
-  uint8_t currentLevel = batt.getLevel();
-  if(currentLevel > 100) currentLevel = 100;
-  if (currentLevel <= 25)
+  uint8_t currentLevel = power.getBatteryLevel();
+  
+  if (currentLevel > 100)
+    currentLevel = 100;
+  if (power.isCharging())
+  {
+    this->m.battFillColor = m.charingBattFillColor;
+    this->m.lastLevel = -1;
+  }
+  else if (currentLevel <= 25)
   {
     this->m.battFillColor = m.lowBattFillColor;
   }
@@ -801,7 +813,7 @@ void UI::batteryUpdate()
   }
   if (currentLevel != m.lastLevel)
   {
-    Lcd.fillRoundRect(272, 10, 34 * currentLevel / 100, 13, 3, m.fillColor);
+    Lcd.fillRoundRect(272, 10, 34, 13, 3, m.fillColor);
     Lcd.fillRoundRect(272, 10, 34 * currentLevel / 100, 13, 3, m.battFillColor);
     this->m.lastLevel = currentLevel;
   }
