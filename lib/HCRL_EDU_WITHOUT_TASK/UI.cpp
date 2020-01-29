@@ -5,6 +5,8 @@
 
 #define BLK_PWM_CHANNEL 7 // LEDC_CHANNEL_7
 
+
+
 UI::UI() : isInited(0)
 {
 }
@@ -240,6 +242,7 @@ void UI::update()
     }
   }
   //main
+
   if (tick_frame())
   {
     main();
@@ -284,6 +287,7 @@ void UI::main_panel()
   m.leftBtn_enable = false;
   m.midBtn_enable = true;
   m.rightBtn_enable = true;
+  st_panel.change = true;
 
   Lcd.setTextColor(m_panel.titleColor);
   Lcd.setCursor(10, 10);
@@ -583,6 +587,7 @@ void UI::sett_panel()
   m.midBtn_enable = true;
   m.rightBtn_enable = true;
   // Lcd.drawRect(0,0,)
+  
   Lcd.setTextColor(st_panel.titleColor);
   Lcd.setCursor(10, 10);
   Lcd.setTextSize(st_panel.titleSize);
@@ -1000,4 +1005,9 @@ void UI::set_node_temp(int index, uint8_t newTemp)
 //   this->node[index].last_data = -1;
 //   this->c_panel.lastIndex = -1;
 //   this->node[index].last_temp_data = -1;
+}
+
+uint8_t UI::get_strip_data()
+{
+  return st_panel.st_data[1];
 }

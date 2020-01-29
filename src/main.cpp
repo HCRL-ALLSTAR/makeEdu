@@ -32,6 +32,7 @@ void PubPIR(const char *topic);
 void PubLight(const char *topic, uint8_t lightStatu);
 void PubAir(const char *topic);
 void PubFan(const char *topic);
+void PubStrip(const char *topic);
 void callback(char *Topic, byte *Paylaod, unsigned int Length);
 
 float temp;
@@ -50,6 +51,7 @@ uint8_t airStatus;
 uint8_t airTemp;
 uint8_t fanStatus;
 uint8_t fanLevel;
+uint8_t RGB_Strip;
 
 millisDelay pubDelay;
 HCRL_EDU hcrl;
@@ -60,7 +62,7 @@ HCRL_EDU hcrl;
 #define LIGHT_2_INDEX 3
 #define LIGHT_3_INDEX 4
 
-int data[6] = {0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp
+int data[7] = {0, 0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp , 6-rgb_strip
 
 void setup()
 {
@@ -142,6 +144,7 @@ void loop()
 
     fanLevel = hcrl.Ui.get_node_data(0);
 
+    RGB_Strip = hcrl.Ui.get_strip_data();
 
     if (fanLevel > 0) //on
     {
@@ -151,10 +154,21 @@ void loop()
     {
         fanStatus = 0;
     }
-    for (uint8_t i = 0; i < STRIP_NUM; i++)
+    if(hcrl.Ui.get_strip_data() == 1)
     {
-        hcrl.STRIP.set_RGB(i, 200, 0, 200);
-        hcrl.STRIP.set_status(i, 1);
+        for (uint8_t i = 0; i < STRIP_NUM; i++)
+        {
+            hcrl.STRIP.set_RGB(i, 200, 0, 200);
+            hcrl.STRIP.set_status(i, 1);
+        }
+    }
+    else if(hcrl.Ui.get_strip_data() == 0)
+    {
+        for (uint8_t i = 0; i < STRIP_NUM; i++)
+        {
+            hcrl.STRIP.set_RGB(i, 200, 0, 200);
+            hcrl.STRIP.set_status(i, 0);
+        }
     }
 
     hcrl.LED.set_RGB(0, light_1RGB[0], light_1RGB[1], light_1RGB[2]);
@@ -188,6 +202,11 @@ void loop()
             PubLight(PUB_LIGHT_2, light_2Status);
             PubLight(PUB_LIGHT_3, light_3Status);
             
+        }
+        if(data[6] != RGB_Strip)
+        {
+            data[6] = RGB_Strip;
+            PubStrip("M5/Strip");
         }
 
         pubDelay.repeat();
@@ -368,5 +387,15 @@ void PubFan(const char *topic)
     docJson[KEY_LEVEL] = fanLevel;
     serializeJson(docJson, json);
     //Sprintln(String(topic) + " : " + String(json));
+    hcrl.MQTT.publish(topic, json);
+}
+
+void PubStrip(const char *topic)
+{
+    size_t size = 1024;
+    DynamicJsonDocument docJson(size);
+    char json[1024];
+    docJson[KEY_STATUS] = RGB_Strip;
+    serializeJson(docJson, json);
     hcrl.MQTT.publish(topic, json);
 }

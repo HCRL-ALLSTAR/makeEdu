@@ -121,6 +121,8 @@ public:
   void set_node_data(int index, uint8_t newData);
   void set_node_temp(int index, uint8_t newTemp);
   //
+  uint8_t get_strip_data();
+  //
   void set_wifi_ssid(char *ssid);
   void set_wifi_status(bool status);
   void set_mqtt_ip(char *ip);
