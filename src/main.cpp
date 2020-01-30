@@ -76,11 +76,11 @@ void setup()
 {
     Serial.begin(115200);
     
-    hcrl.WiFi.begin("WIFIIV", "0245760494");
-    hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
+    // hcrl.WiFi.begin("WIFIIV", "0245760494");
+    // hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
 
-    // hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
-    // hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
+    hcrl.WiFi.begin(HCRL_WiFi_SSID, HCRL_WiFi_PASS);
+    hcrl.MQTT.begin(HCRL_MQTT_SERVER, HCRL_MQTT_PORT, callback);
 
     hcrl.MQTT.startSubscribe("/test");
     hcrl.MQTT.startSubscribe(SUB_AIR);
