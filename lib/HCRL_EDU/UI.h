@@ -41,7 +41,6 @@
         BtnA/B/C.releasedFor(uint32_t ms);
         BtnA/B/C.lastChange();
  */
-// #define ESP32
 
 #ifndef _UI_H_
 #define _UI_H_
@@ -70,11 +69,6 @@
 #define FAN 2
 #define AIR 1
 #define LIGHT 0
-
-struct Node
-{
-  
-};
 
 class UI
 {
@@ -121,18 +115,18 @@ public:
   void set_motion(int motion);
 
 private:
-//watchdog
-hw_timer_t *timer = NULL;
-//custom RGB565
-#define AQUA 0x4B1D
-#define MITAKA 0xFC00
-//
-#define MAIN 0
-#define STAT 1
-#define CONT 2
-#define SETT 3
-#define AIRCONT 10
-#define RETURN_MS 1000
+  //watchdog
+  hw_timer_t *timer = NULL;
+  //custom RGB565
+  #define AQUA 0x4B1D
+  #define MITAKA 0xFC00
+  //
+  #define MAIN 0
+  #define STAT 1
+  #define CONT 2
+  #define SETT 3
+  #define AIRCONT 10
+  #define RETURN_MS 1000
   //
 
   //
@@ -195,9 +189,6 @@ hw_timer_t *timer = NULL;
   Menu m;
   void menu_disp();
   void batteryUpdate();
-  //
-  bool tick_frame();
-  void framerate_update();
   //
   struct Main_panel
   {
@@ -262,10 +253,6 @@ hw_timer_t *timer = NULL;
   Sett_panel st_panel;
   void sett_panel();
   //
-  Node node[MAX_NODE];
-  //
-  TaskHandle_t updateHandle;
-  static void updateCode(void *);
 };
 #else
 #error “This library only supports boards with ESP32 processor.”

@@ -995,9 +995,6 @@ void UI::set_node_data(int index, uint8_t newData)
 void UI::set_node_temp(int index, uint8_t newTemp)
 {
   this->temp_data[index] = newTemp;
-//   this->node[index].last_data = -1;
-//   this->c_panel.lastIndex = -1;
-//   this->node[index].last_temp_data = -1;
 }
 
 uint8_t UI::get_strip_data()
