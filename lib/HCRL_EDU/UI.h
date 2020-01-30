@@ -63,6 +63,8 @@
 
 #include "Free_Fonts.h"
 
+#include <esp_system.h>
+
 #define MAX_NODE 32
 #define MAX_SUB 32
 #define FAN 2
@@ -72,10 +74,6 @@
 struct Node
 {
   bool EN = false;
-  struct Sub_node
-  {
-  };
-  Sub_node sub[MAX_SUB];
   char *titlePic = "/blank.png";
   char *titlePic_Hover = "/blank.png";
   String title_1st;
@@ -83,10 +81,6 @@ struct Node
   uint16_t title1stColor = WHITE;
   uint16_t title2ndColor = WHITE;
   uint8_t titleSize = 2;
-  uint8_t data = 0;
-  int8_t temp_data = 25;
-  int8_t last_temp_data = -1;
-  uint8_t last_data = -1;
   uint8_t type; // 2 : Fan, 1 : Air, 0 : Light
 };
 
@@ -135,6 +129,8 @@ public:
   void set_motion(int motion);
 
 private:
+//watchdog
+hw_timer_t *timer = NULL;
 //custom RGB565
 #define AQUA 0x4B1D
 //
@@ -168,6 +164,11 @@ private:
   int last_motion = -1;
   int battery = 0;
   bool revert = false;
+  //
+  uint8_t data[32];
+  int8_t temp_data[32];
+  int8_t last_temp_data[32];
+  uint8_t last_data[32];
   //
   struct Menu
   {

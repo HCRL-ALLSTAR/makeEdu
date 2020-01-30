@@ -16,8 +16,6 @@
 #include "UI.cpp"
 #include "JSON/jsonwrapper.hpp"
 
-#include <esp_system.h>
-
 using jsonWrapper = json;
 using uiWrapper = UI;
 using angleWrapper = angleClass;
@@ -29,7 +27,6 @@ class HCRL_EDU
 private:
     /* data */
     millisDelay updateDelay;
-    hw_timer_t *timer = NULL;
 
 public:
     HCRL_EDU(/* args */);
@@ -55,10 +52,6 @@ public:
 HCRL_EDU::HCRL_EDU(/* args */)
 {
     this->updateDelay.start(Sec2MS(3));
-    this->timer = timerBegin(0, 80, true); //timer 0, div 80
-    timerAttachInterrupt(timer, esp_restart, true);
-    timerAlarmWrite(timer, 3000000, false); //set time in us
-    timerAlarmEnable(timer);                //enable interrupt
 }
 
 HCRL_EDU::~HCRL_EDU()
@@ -67,8 +60,6 @@ HCRL_EDU::~HCRL_EDU()
 
 void HCRL_EDU::update()
 {
-    timerWrite(this->timer, 0);
-    
     STRIP.update();
     LED.update();
     MQTT.update();

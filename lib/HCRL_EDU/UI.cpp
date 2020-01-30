@@ -9,6 +9,10 @@
 
 UI::UI() : isInited(0)
 {
+  this->timer = timerBegin(0, 80, true); //timer 0, div 80
+  timerAttachInterrupt(timer, esp_restart, true);
+  timerAlarmWrite(timer, 3000000, false); //set time in us
+  timerAlarmEnable(timer);                //enable interrupt
 }
 
 //init UI
@@ -60,11 +64,19 @@ void UI::begin(bool LCDEnable, bool SDEnable, bool SerialEnable)
   power.begin();
 
   this->period = 1000 / refreshRate;
+
+  for(int i = 0; i< 32;i++){
+    this->data[i] = 0;
+    this->temp_data[i] = 25;
+    this->last_temp_data[i] = -1;
+    this->last_data[i] = -1;
+  }
 }
 
 //update all UI components
 void UI::update()
 {
+  timerWrite(this->timer, 0);
   // //Button update
   BtnA.read();
   BtnB.read();
@@ -91,7 +103,7 @@ void UI::update()
       }
       else if (sub_panel == AIRCONT)
       {
-        this->node[c_panel.index].temp_data -= 1;
+        this->temp_data[c_panel.index] -= 1;
       }
     }
     if (panel == SETT)
@@ -139,8 +151,8 @@ void UI::update()
       else if (m_panel.select == 0b010)
       { //control
         this->panel = CONT;
-        this->node[c_panel.index].last_data = -1;
-        this->node[c_panel.index].last_temp_data = -1;
+        this->last_data[c_panel.index] = -1;
+        this->last_temp_data[c_panel.index] = -1;
       }
       else
       { //settings
@@ -157,12 +169,12 @@ void UI::update()
       {
         if (node[c_panel.index].type == FAN)
         {
-          this->node[c_panel.index].data++;
-          if (node[c_panel.index].data == 4)
-            this->node[c_panel.index].data = 0;
+          this->data[c_panel.index]++;
+          if (data[c_panel.index] == 4)
+            this->data[c_panel.index] = 0;
         }
         else
-          this->node[c_panel.index].data = !node[c_panel.index].data;
+          this->data[c_panel.index] = !data[c_panel.index];
       }
       else if (sub_panel == AIRCONT)
       {
@@ -175,11 +187,11 @@ void UI::update()
         this->sub_panel = MAIN;
       }
 
-      if (node[c_panel.index].type == LIGHT || node[c_panel.index].data == 0 || node[c_panel.index].data == 1)
+      if (node[c_panel.index].type == LIGHT || data[c_panel.index] == 0 || data[c_panel.index] == 1)
         this->c_panel.lastIndex = -1;
       this->m.lastLevel = -1;
-      this->node[c_panel.index].last_data = -1;
-      this->node[c_panel.index].last_temp_data = -1;
+      this->last_data[c_panel.index] = -1;
+      this->last_temp_data[c_panel.index] = -1;
     }
     else if (panel == SETT)
     {
@@ -201,8 +213,8 @@ void UI::update()
         this->c_panel.index = 0;
         this->return_c = millis();
 
-        this->node[c_panel.index].last_data = -1;
-        this->node[c_panel.index].last_temp_data = -1;
+        this->last_data[c_panel.index] = -1;
+        this->last_temp_data[c_panel.index] = -1;
       }
       else if (sub_panel == AIRCONT)
       {
@@ -225,12 +237,12 @@ void UI::update()
         if (c_panel.index == c_panel.size)
           this->c_panel.index = 0;
 
-        this->node[c_panel.index].last_data = -1;
-        this->node[c_panel.index].last_temp_data = -1;
+        this->last_data[c_panel.index] = -1;
+        this->last_temp_data[c_panel.index] = -1;
       }
       else if (sub_panel == AIRCONT)
       {
-        this->node[c_panel.index].temp_data += 1;
+        this->temp_data[c_panel.index] += 1;
       }
     }
     if(panel == SETT)
@@ -483,7 +495,7 @@ void UI::cont_panel()
     {
       offset_x = 18;
     }
-    if (!node[c_panel.index].data)
+    if (!data[c_panel.index])
       Lcd.drawPngFile(SPIFFS, node[c_panel.index].titlePic, 160 - 75 + 22 - offset_x, 120 - 75 + 3);
     else
       Lcd.drawPngFile(SPIFFS, node[c_panel.index].titlePic_Hover, 160 - 75 + 22 - offset_x, 120 - 75 + 3);
@@ -524,63 +536,63 @@ void UI::cont_panel()
   }
   if (node[c_panel.index].type == FAN)
   {
-    if (node[c_panel.index].data != node[c_panel.index].last_data)
+    if (data[c_panel.index] != last_data[c_panel.index])
     {
-      if (node[c_panel.index].data == 0)
+      if (data[c_panel.index] == 0)
       {
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 2, 33 - 4, 17 - 4, 3, c_panel.fillColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 19 + 2, 33 - 4, 17 - 4, 3, c_panel.fillColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 38 + 2, 33 - 4, 17 - 4, 3, c_panel.fillColor);
       }
-      else if (node[c_panel.index].data == 1)
+      else if (data[c_panel.index] == 1)
       {
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 2, 33 - 4, 17 - 4, 3, c_panel.fillColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 19 + 2, 33 - 4, 17 - 4, 3, c_panel.fillColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 38 + 2, 33 - 4, 17 - 4, 3, c_panel.lineColor);
       }
-      else if (node[c_panel.index].data == 2)
+      else if (data[c_panel.index] == 2)
       {
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 2, 33 - 4, 17 - 4, 3, c_panel.fillColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 19 + 2, 33 - 4, 17 - 4, 3, c_panel.lineColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 38 + 2, 33 - 4, 17 - 4, 3, c_panel.lineColor);
       }
-      else if (node[c_panel.index].data == 3)
+      else if (data[c_panel.index] == 3)
       {
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 2, 33 - 4, 17 - 4, 3, c_panel.lineColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 19 + 2, 33 - 4, 17 - 4, 3, c_panel.lineColor);
         Lcd.fillRoundRect(160 - 75 + 113 + 2, 120 - 75 + 3 + 26 + 38 + 2, 33 - 4, 17 - 4, 3, c_panel.lineColor);
       }
 
-      this->node[c_panel.index].last_data = node[c_panel.index].data;
+      this->last_data[c_panel.index] = data[c_panel.index];
     }
   }
   else if (node[c_panel.index].type == AIR)
   {
-    if (node[c_panel.index].data != node[c_panel.index].last_data)
+    if (data[c_panel.index] != last_data[c_panel.index])
     {
-      this->node[c_panel.index].last_data = node[c_panel.index].data;
+      this->last_data[c_panel.index] = data[c_panel.index];
     }
-    if (node[c_panel.index].temp_data != node[c_panel.index].last_temp_data)
+    if (temp_data[c_panel.index] != last_temp_data[c_panel.index])
     {
 
       Lcd.setTextColor(backgroundColor);
       Lcd.setTextSize(2);
       Lcd.setCursor(160 - 75 + 113 + 5, 120 - 75 + 3 + 26 + 19);
-      Lcd.print(node[c_panel.index].last_temp_data);
+      Lcd.print(last_temp_data[c_panel.index]);
 
       Lcd.setTextColor(m.lineColor);
       Lcd.setTextSize(2);
       Lcd.setCursor(160 - 75 + 113 + 5, 120 - 75 + 3 + 26 + 19);
-      Lcd.print(node[c_panel.index].temp_data);
+      Lcd.print(temp_data[c_panel.index]);
 
-      this->node[c_panel.index].last_temp_data = node[c_panel.index].temp_data;
+      this->last_temp_data[c_panel.index] = temp_data[c_panel.index];
     }
   }
   else if(node[c_panel.index].type == LIGHT)
   {
-    if (node[c_panel.index].data != node[c_panel.index].last_data)
+    if (data[c_panel.index] != last_data[c_panel.index])
     {
-      this->node[c_panel.index].last_data = node[c_panel.index].data;
+      this->last_data[c_panel.index] = data[c_panel.index];
     }
   }
 }
@@ -801,7 +813,10 @@ void UI::batteryUpdate()
   if (power.isCharging())
   {
     this->m.battFillColor = m.charingBattFillColor;
-    this->m.lastLevel = -1;
+    if(revert){
+      this->m.lastLevel = -1;
+      this->revert = false;
+    }
   }
   else if (currentLevel <= 25)
   {
@@ -810,6 +825,7 @@ void UI::batteryUpdate()
   else
   {
     this->m.battFillColor = m.defaultBattFillColor;
+    this->revert = true;
   }
   if (currentLevel != m.lastLevel)
   {
@@ -862,7 +878,7 @@ void UI::node_init(uint8_t size)
   for (int i = 0; i < size; i++)
   {
     this->node[i].EN = true;
-    this->node[i].data = 0;
+    this->data[i] = 0;
   }
   this->c_panel.size = size;
 }
@@ -983,37 +999,37 @@ void UI::set_motion(int motion)
 //get Method
 uint8_t UI::get_node_data(int index)
 {
-  return node[index].data;
+  return data[index];
 }
 int8_t UI::get_node_temp(int index)
 {
-  return node[index].temp_data;
+  return temp_data[index];
 }
 
 void UI::set_node_data(int index, uint8_t newData)
 {
-  this->node[index].data = newData;
-  if (index == c_panel.index && node[index].last_data != newData && node[index].type == AIR)
+  this->data[index] = newData;
+  if (index == c_panel.index && last_data[index] != newData && node[index].type == AIR)
   {
     this->c_panel.lastIndex = -1;
-    this->node[index].last_temp_data = -1;
+    this->last_temp_data[index] = -1;
   }
-  else if (node[index].type == FAN && newData == 0 && node[index].last_data != 0)
-  {
-    this->c_panel.lastIndex = -1;
-  }
-  else if (node[index].type == FAN && newData != 0 && node[index].last_data == 0)
+  else if (node[index].type == FAN && newData == 0 && last_data[index] != 0)
   {
     this->c_panel.lastIndex = -1;
   }
-  else if (node[index].type == LIGHT && newData != node[index].last_data && index == c_panel.index)
+  else if (node[index].type == FAN && newData != 0 && last_data[index] == 0)
+  {
+    this->c_panel.lastIndex = -1;
+  }
+  else if (node[index].type == LIGHT && newData != last_data[index] && index == c_panel.index)
   {
     this->c_panel.lastIndex = -1;
   }
 }
 void UI::set_node_temp(int index, uint8_t newTemp)
 {
-  this->node[index].temp_data = newTemp;
+  this->temp_data[index] = newTemp;
 //   this->node[index].last_data = -1;
 //   this->c_panel.lastIndex = -1;
 //   this->node[index].last_temp_data = -1;
