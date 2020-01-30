@@ -56,21 +56,25 @@ void UI::begin(bool LCDEnable, bool SDEnable, bool SerialEnable)
     return;
   }
 
+  for (int i = 0; i < 32; i++)
+  {
+    this->data[i] = 0;
+    this->temp_data[i] = 25;
+    this->last_temp_data[i] = -1;
+    this->last_data[i] = -1;
+    this->EN[i] = false;
+    this->title1stColor[i] = WHITE;
+    this->title2ndColor[i] = WHITE;
+    this->titleSize[i] = 2;
+    node_setTitlePic(i,"/dummy.png","/dummy.png");
+  }
+
   if (SerialEnable == true)
   {
     Serial.println("OK");
   }
 
   power.begin();
-
-  this->period = 1000 / refreshRate;
-
-  for(int i = 0; i< 32;i++){
-    this->data[i] = 0;
-    this->temp_data[i] = 25;
-    this->last_temp_data[i] = -1;
-    this->last_data[i] = -1;
-  }
 }
 
 //update all UI components
@@ -91,7 +95,6 @@ void UI::update()
     }
     if (panel == STAT)
     {
-
       this->panel = MAIN;
     }
     if (panel == CONT)
@@ -122,7 +125,7 @@ void UI::update()
     }
     else if (panel == CONT)
     {
-      if (node[c_panel.index].type == AIR && sub_panel == MAIN)
+      if (type[c_panel.index] == AIR && sub_panel == MAIN)
       {
         Lcd.setTextColor(backgroundColor);
         Lcd.setTextSize(2);
@@ -131,7 +134,7 @@ void UI::update()
         Lcd.setCursor(219, 221);
         Lcd.print(m.rightText);
         this->sub_panel = AIRCONT;
-        this->return_ac = millis();
+        this->hold = true;
       }
     }
     else if (panel == SETT)
@@ -163,11 +166,11 @@ void UI::update()
     else if (panel == STAT)
     {
     }
-    else if (panel == CONT && millis() - return_ac > AC_RETURN_MS)
+    else if (panel == CONT)
     {
       if (sub_panel == MAIN)
       {
-        if (node[c_panel.index].type == FAN)
+        if (type[c_panel.index] == FAN)
         {
           this->data[c_panel.index]++;
           if (data[c_panel.index] == 4)
@@ -176,7 +179,7 @@ void UI::update()
         else
           this->data[c_panel.index] = !data[c_panel.index];
       }
-      else if (sub_panel == AIRCONT)
+      else if (sub_panel == AIRCONT && !hold)
       {
         Lcd.setTextColor(backgroundColor);
         Lcd.setTextSize(2);
@@ -186,8 +189,9 @@ void UI::update()
         Lcd.print(m.rightText);
         this->sub_panel = MAIN;
       }
+      else this->hold = false;
 
-      if (node[c_panel.index].type == LIGHT || data[c_panel.index] == 0 || data[c_panel.index] == 1)
+      if (type[c_panel.index] == LIGHT || data[c_panel.index] == 0 || data[c_panel.index] == 1)
         this->c_panel.lastIndex = -1;
       this->m.lastLevel = -1;
       this->last_data[c_panel.index] = -1;
@@ -211,7 +215,7 @@ void UI::update()
       if (sub_panel == MAIN)
       {
         this->c_panel.index = 0;
-        this->return_c = millis();
+        this->hold2 = true;
 
         this->last_data[c_panel.index] = -1;
         this->last_temp_data[c_panel.index] = -1;
@@ -221,15 +225,24 @@ void UI::update()
       }
     }
   }
-  else if (BtnC.wasReleased())
-  {
+  else if (BtnC.wasPressed()){
+    if (panel == SETT)
+    {
+      this->m.cursor += 1;
+      if (m.cursor == 3)
+        this->m.cursor = 0;
+      this->st_panel.change = true;
+    }
     if (panel == MAIN)
     {
       this->m_panel.select >>= 1;
       if (m_panel.select == 0)
         this->m_panel.select = 0b100;
     }
-    if (panel == CONT && millis() - return_c > POS_RETURN_MS)
+  }
+  else if (BtnC.wasReleased())
+  {  
+    if (panel == CONT && !hold2)
     {
       if (sub_panel == MAIN)
       {
@@ -245,25 +258,11 @@ void UI::update()
         this->temp_data[c_panel.index] += 1;
       }
     }
-    if(panel == SETT)
-    {
-      this->m.cursor += 1;
-      if(m.cursor == 3)
-        this->m.cursor = 0;
-      this->st_panel.change = true;
-    }
+    else this->hold2 = false;
+    
   }
   //main
-
-  if (tick_frame())
-  {
-    main();
-  }
-
-  //Setting Update
-
-  // frame control
-  framerate_update();
+  main();
 }
 
 void UI::setBrightness(uint8_t brightness)
@@ -295,55 +294,57 @@ void UI::main()
 
 void UI::main_panel()
 {
-
   m.leftBtn_enable = false;
   m.midBtn_enable = true;
   m.rightBtn_enable = true;
   st_panel.change = true;
 
-  Lcd.setTextColor(m_panel.titleColor);
-  Lcd.setCursor(10, 10);
-  Lcd.setTextSize(m_panel.titleSize);
-  Lcd.print(m_panel.title);
   //box
   if (m_panel.select != m_panel.lastSel)
   {
-    if (m_panel.select & 0b100)
-      Lcd.fillRoundRect(159 - 135, 50, 120, 120, 5, m_panel.selFillColor);
-    else
-      Lcd.fillRoundRect(159 - 135, 50, 120, 120, 5, m_panel.fillColor);
-    if (m_panel.select & 0b010)
-      Lcd.fillRoundRect(159 + 15, 50, 120, 120, 5, m_panel.selFillColor);
-    else
-      Lcd.fillRoundRect(159 + 15, 50, 120, 120, 5, m_panel.fillColor);
-    if (m_panel.select & 0b001)
-      Lcd.fillRoundRect(159 - 75, 180, 150, 30, 5, m_panel.selFillColor);
-    else
-      Lcd.fillRoundRect(159 - 75, 180, 150, 30, 5, m_panel.fillColor);
+    Lcd.setTextColor(m_panel.titleColor);
+    Lcd.setCursor(10, 10);
+    Lcd.setTextSize(m_panel.titleSize);
+    Lcd.print(m_panel.title);
 
     if (m_panel.select & 0b100)
-      Lcd.drawRoundRect(159 - 135, 50, 120, 120, 5, m_panel.selLineColor);
+      Lcd.fillRoundRect(159 - 135, 50, 120, 120, 15, m_panel.selFillColor);
     else
-      Lcd.drawRoundRect(159 - 135, 50, 120, 120, 5, m_panel.lineColor);
+      Lcd.fillRoundRect(159 - 135, 50, 120, 120, 15, m_panel.fillColor);
     if (m_panel.select & 0b010)
-      Lcd.drawRoundRect(159 + 15, 50, 120, 120, 5, m_panel.selLineColor);
+      Lcd.fillRoundRect(159 + 15, 50, 120, 120, 15, m_panel.selFillColor);
     else
-      Lcd.drawRoundRect(159 + 15, 50, 120, 120, 5, m_panel.lineColor);
+      Lcd.fillRoundRect(159 + 15, 50, 120, 120, 15, m_panel.fillColor);
     if (m_panel.select & 0b001)
-      Lcd.drawRoundRect(159 - 75, 180, 150, 30, 5, m_panel.selLineColor);
+      Lcd.fillRoundRect(159 - 75, 180, 150, 30, 15, m_panel.selFillColor);
     else
-      Lcd.drawRoundRect(159 - 75, 180, 150, 30, 5, m_panel.lineColor);
-    this->m_panel.lastSel = m_panel.select;
+      Lcd.fillRoundRect(159 - 75, 180, 150, 30, 15, m_panel.fillColor);
+
+    if (m_panel.select & 0b100)
+      Lcd.drawRoundRect(159 - 135, 50, 120, 120, 15, m_panel.selLineColor);
+    else
+      Lcd.drawRoundRect(159 - 135, 50, 120, 120, 15, m_panel.lineColor);
+    if (m_panel.select & 0b010)
+      Lcd.drawRoundRect(159 + 15, 50, 120, 120, 15, m_panel.selLineColor);
+    else
+      Lcd.drawRoundRect(159 + 15, 50, 120, 120, 15, m_panel.lineColor);
+    if (m_panel.select & 0b001)
+      Lcd.drawRoundRect(159 - 75, 180, 150, 30, 15, m_panel.selLineColor);
+    else
+      Lcd.drawRoundRect(159 - 75, 180, 150, 30, 15, m_panel.lineColor);
+    this->m_panel.lastSel = m_panel.select; 
+
+    //text
+    Lcd.setTextColor(m_panel.lineColor);
+    Lcd.setTextSize(2);
+    Lcd.setCursor(159 - 70, 190);
+    Lcd.print("  Settings  ");
+    Lcd.setCursor(159 - 133, 105);
+    Lcd.print("  Status ");
+    Lcd.setCursor(159 + 23, 105);
+    Lcd.print(" Control ");
   }
-  //text
-  Lcd.setTextColor(m_panel.lineColor);
-  Lcd.setTextSize(2);
-  Lcd.setCursor(159 - 70, 190);
-  Lcd.print("  Settings  ");
-  Lcd.setCursor(159 - 133, 105);
-  Lcd.print("  Status ");
-  Lcd.setCursor(159 + 23, 105);
-  Lcd.print(" Control ");
+  
 }
 
 void UI::stat_panel()
@@ -487,7 +488,7 @@ void UI::cont_panel()
     Lcd.drawRoundRect(160 - 75, 120 - 75, 150, 150, 5, c_panel.lineColor);
 
     uint8_t offset_x;
-    if (!node[c_panel.index].type)
+    if (!type[c_panel.index])
     {
       offset_x = 0;
     }
@@ -496,11 +497,11 @@ void UI::cont_panel()
       offset_x = 18;
     }
     if (!data[c_panel.index])
-      Lcd.drawPngFile(SPIFFS, node[c_panel.index].titlePic, 160 - 75 + 22 - offset_x, 120 - 75 + 3);
+      Lcd.drawPngFile(SPIFFS, titlePic[c_panel.index], 160 - 75 + 22 - offset_x, 120 - 75 + 3);
     else
-      Lcd.drawPngFile(SPIFFS, node[c_panel.index].titlePic_Hover, 160 - 75 + 22 - offset_x, 120 - 75 + 3);
+      Lcd.drawPngFile(SPIFFS, titlePic_Hover[c_panel.index], 160 - 75 + 22 - offset_x, 120 - 75 + 3);
 
-    if (node[c_panel.index].type == FAN)
+    if (type[c_panel.index] == FAN)
     {
       Lcd.setTextColor(m.lineColor);
       Lcd.setTextSize(2);
@@ -513,7 +514,7 @@ void UI::cont_panel()
       Lcd.drawRoundRect(160 - 75 + 113, 120 - 75 + 3 + 26 + 19, 33, 17, 5, c_panel.lineColor);
       Lcd.drawRoundRect(160 - 75 + 113, 120 - 75 + 3 + 26 + 38, 33, 17, 5, c_panel.lineColor);
     }
-    else if (node[c_panel.index].type == AIR)
+    else if (type[c_panel.index] == AIR)
     {
       Lcd.setTextColor(m.lineColor);
       Lcd.setTextSize(2);
@@ -525,16 +526,16 @@ void UI::cont_panel()
       Lcd.drawRoundRect(160 - 75 + 113, 120 - 75 + 3 + 26, 33, 51, 5, c_panel.lineColor);
     }
 
-    Lcd.setTextSize(node[c_panel.index].titleSize);
+    Lcd.setTextSize(titleSize[c_panel.index]);
     Lcd.setCursor(160 - 75 + 5, 120 + 75 - 10 - 10 - 20);
-    Lcd.print(node[c_panel.index].title_1st);
-    Lcd.setTextColor(node[c_panel.index].title2ndColor);
+    Lcd.print(title_1st[c_panel.index]);
+    Lcd.setTextColor(title2ndColor[c_panel.index]);
     Lcd.setCursor(160 - 75 + 5, 120 + 75 - 10 - 10);
-    Lcd.print(node[c_panel.index].title_2nd);
+    Lcd.print(title_2nd[c_panel.index]);
 
     this->c_panel.lastIndex = c_panel.index;
   }
-  if (node[c_panel.index].type == FAN)
+  if (type[c_panel.index] == FAN)
   {
     if (data[c_panel.index] != last_data[c_panel.index])
     {
@@ -566,7 +567,7 @@ void UI::cont_panel()
       this->last_data[c_panel.index] = data[c_panel.index];
     }
   }
-  else if (node[c_panel.index].type == AIR)
+  else if (type[c_panel.index] == AIR)
   {
     if (data[c_panel.index] != last_data[c_panel.index])
     {
@@ -588,7 +589,7 @@ void UI::cont_panel()
       this->last_temp_data[c_panel.index] = temp_data[c_panel.index];
     }
   }
-  else if(node[c_panel.index].type == LIGHT)
+  else if(type[c_panel.index] == LIGHT)
   {
     if (data[c_panel.index] != last_data[c_panel.index])
     {
@@ -616,16 +617,20 @@ void UI::sett_panel()
     {
       Lcd.fillRect(0,42,320,56,st_panel.selFillColor);
       Lcd.drawCircle(25,70,15,st_panel.fillColor);
+
+      Lcd.setTextSize(2);
       Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 63);
-      Lcd.setTextSize(2);
-      Lcd.print("Brightness");
+      Lcd.print("LCD Brightness");
       Lcd.drawCircle(25,126,15,st_panel.fillColor);
       Lcd.setTextColor(st_panel.lineColor);
       Lcd.setCursor(50, 118);
-      Lcd.setTextSize(2);
-      Lcd.print("RGB_Strip");
+      Lcd.print("LED Brightness");
       Lcd.drawCircle(25,182,15,st_panel.fillColor);
+      Lcd.setTextColor(st_panel.lineColor);
+      Lcd.setCursor(50, 173);
+      Lcd.print("STP Brightness");
+
       if(st_panel.st_data[0] == 1) //brightness
       {
         Lcd.fillCircle(25,70,12,st_panel.fillColor);
@@ -645,18 +650,10 @@ void UI::sett_panel()
       if(st_panel.st_data[2] == 1)
       {
         Lcd.fillCircle(25,182,12,st_panel.fillColor);
-        Lcd.setTextColor(st_panel.lineColor);
-        Lcd.setCursor(50, 173);
-        Lcd.setTextSize(2);
-        Lcd.print("Theme : LIGHT");
       }
       else if(st_panel.st_data[2] == 0)
       {
         Lcd.fillCircle(25,182,12,backgroundColor);
-        Lcd.setTextColor(st_panel.lineColor);
-        Lcd.setCursor(50, 173);
-        Lcd.setTextSize(2);
-        Lcd.print("Theme : DARK");
       }
     }
     else if(m.cursor == 1)
@@ -765,18 +762,18 @@ void UI::menu_disp()
   if (m.fillColor != BLACK)
   {
     if (m.leftBtn_visible)
-      Lcd.fillRoundRect(0, 219, 105, 19, 5, m.fillColor);
+      Lcd.fillRoundRect(0, 219, 105, 19, 8, m.fillColor);
     if (m.midBtn_visible)
-      Lcd.fillRoundRect(107, 219, 105, 19, 5, m.fillColor);
+      Lcd.fillRoundRect(107, 219, 105, 19, 8, m.fillColor);
     if (m.rightBtn_visible)
-      Lcd.fillRoundRect(214, 219, 105, 19, 5, m.fillColor);
+      Lcd.fillRoundRect(214, 219, 105, 19, 8, m.fillColor);
   }
   if (m.leftBtn_visible)
-    Lcd.drawRoundRect(0, 219, 105, 19, 5, m.lineColor);
+    Lcd.drawRoundRect(0, 219, 105, 19, 8, m.lineColor);
   if (m.midBtn_visible)
-    Lcd.drawRoundRect(107, 219, 105, 19, 5, m.lineColor);
+    Lcd.drawRoundRect(107, 219, 105, 19, 8, m.lineColor);
   if (m.rightBtn_visible)
-    Lcd.drawRoundRect(214, 219, 105, 19, 5, m.lineColor);
+    Lcd.drawRoundRect(214, 219, 105, 19, 8, m.lineColor);
   //text
   if (m.leftBtn_visible && m.leftBtn_enable)
     Lcd.setTextColor(m.lineColor);
@@ -835,38 +832,6 @@ void UI::batteryUpdate()
   }
 }
 
-bool UI::tick_frame()
-{
-  if (millis() - time > period)
-  {
-    this->time = millis();
-    this->fps += 1;
-    return true;
-  }
-  else
-    return false;
-}
-
-void UI::framerate_update()
-{
-  if (millis() - counter > 1000)
-  {
-    //Serial.print("Framerate >> ");
-    //Serial.println(fps);
-    if (fps < idealRefreshRate)
-    {
-      this->refreshRate += 1;
-    }
-    else if (fps > idealRefreshRate)
-    {
-      this->refreshRate -= 1;
-    }
-    this->period = 1000 / refreshRate;
-    this->fps = 0;
-    this->counter = millis();
-  }
-}
-
 /*Node initializing
           size:     number of node to be used
           default:  1
@@ -877,7 +842,7 @@ void UI::node_init(uint8_t size)
   this->node_size = size;
   for (int i = 0; i < size; i++)
   {
-    this->node[i].EN = true;
+    this->EN[i] = true;
     this->data[i] = 0;
   }
   this->c_panel.size = size;
@@ -891,12 +856,12 @@ void UI::node_init(uint8_t size)
 */
 void UI::node_setTitle(uint8_t index, String title_1st, String title_2nd)
 {
-  if (node[index].EN)
+  if (EN[index])
   {
     if (title_1st != "")
-      this->node[index].title_1st = title_1st;
+      this->title_1st[index] = title_1st;
     if (title_2nd != "")
-      this->node[index].title_2nd = title_2nd;
+      this->title_2nd[index] = title_2nd;
   }
 }
 /*set node type for different control
@@ -906,9 +871,9 @@ void UI::node_setTitle(uint8_t index, String title_1st, String title_2nd)
 */
 void UI::node_setType(uint8_t index, uint8_t typeSelect)
 {
-  if (node[index].EN)
+  if (EN[index])
   {
-    this->node[index].type = typeSelect;
+    this->type[index] = typeSelect;
   }
 }
 /*set node title picture at specific index
@@ -922,20 +887,20 @@ void UI::node_setType(uint8_t index, uint8_t typeSelect)
 */
 void UI::node_setTitlePic(uint8_t index, const char *base_path, const char *hover_path)
 {
-  if (node[index].EN)
+  if (EN[index])
   {
-    this->node[index].titlePic = (char *)base_path;
-    this->node[index].titlePic_Hover = (char *)hover_path;
+    this->titlePic[index] = (char *)base_path;
+    this->titlePic_Hover[index] = (char *)hover_path;
   }
 }
 
 //set node title color at specific index
 void UI::node_setTitleColor(uint8_t index, uint16_t title_1st, uint16_t title_2nd)
 {
-  if (node[index].EN)
+  if (EN[index])
   {
-    this->node[index].title1stColor = title_1st;
-    this->node[index].title2ndColor = title_2nd;
+    this->title1stColor[index] = title_1st;
+    this->title2ndColor[index] = title_2nd;
   }
 }
 
@@ -944,8 +909,8 @@ void UI::node_setAllTitleColor(uint16_t title_1st, uint16_t title_2nd)
 {
   for (int i = 0; i < c_panel.size; i++)
   {
-    this->node[i].title1stColor = title_1st;
-    this->node[i].title2ndColor = title_2nd;
+    this->title1stColor[i] = title_1st;
+    this->title2ndColor[i] = title_2nd;
   }
 }
 
@@ -1009,20 +974,20 @@ int8_t UI::get_node_temp(int index)
 void UI::set_node_data(int index, uint8_t newData)
 {
   this->data[index] = newData;
-  if (index == c_panel.index && last_data[index] != newData && node[index].type == AIR)
+  if (index == c_panel.index && last_data[index] != newData && type[index] == AIR)
   {
     this->c_panel.lastIndex = -1;
     this->last_temp_data[index] = -1;
   }
-  else if (node[index].type == FAN && newData == 0 && last_data[index] != 0)
+  else if (type[index] == FAN && newData == 0 && last_data[index] != 0)
   {
     this->c_panel.lastIndex = -1;
   }
-  else if (node[index].type == FAN && newData != 0 && last_data[index] == 0)
+  else if (type[index] == FAN && newData != 0 && last_data[index] == 0)
   {
     this->c_panel.lastIndex = -1;
   }
-  else if (node[index].type == LIGHT && newData != last_data[index] && index == c_panel.index)
+  else if (type[index] == LIGHT && newData != last_data[index] && index == c_panel.index)
   {
     this->c_panel.lastIndex = -1;
   }

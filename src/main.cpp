@@ -92,7 +92,6 @@ void setup()
     delay(100);
 
     hcrl.Ui.begin();
-
     //UI
     hcrl.Ui.node_init(5);
     for (int i = 0; i < 5; i++)
@@ -135,7 +134,6 @@ void setup()
     hcrl.LED.setBrightness(10);
     hcrl.STRIP.setBrightness(10);
 }
-
 void loop()
 {
     temp = hcrl.ENV.getTemp();
@@ -163,21 +161,11 @@ void loop()
     {
         fanStatus = 0;
     }
-    if (hcrl.Ui.get_strip_data() == 1)
+
+    for (uint8_t i = 0; i < STRIP_NUM; i++)
     {
-        for (uint8_t i = 0; i < STRIP_NUM; i++)
-        {
-            hcrl.STRIP.set_RGB(i, 200, 0, 200);
-            hcrl.STRIP.set_status(i, 1);
-        }
-    }
-    else if (hcrl.Ui.get_strip_data() == 0)
-    {
-        for (uint8_t i = 0; i < STRIP_NUM; i++)
-        {
-            hcrl.STRIP.set_RGB(i, 200, 0, 200);
-            hcrl.STRIP.set_status(i, 0);
-        }
+        hcrl.STRIP.set_RGB(i, 200, 0, 200);
+        hcrl.STRIP.set_status(i, 1);
     }
 
     hcrl.LED.set_RGB(0, light_1RGB[0], light_1RGB[1], light_1RGB[2]);

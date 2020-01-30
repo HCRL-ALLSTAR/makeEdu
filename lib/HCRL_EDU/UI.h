@@ -1,5 +1,5 @@
 /**
-    LCD:
+    Lcd:
         lcd.setBrightness(uint8_t brightness);
         Lcd.drawPixel(int16_t x, int16_t y, uint16_t color);
         Lcd.drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
@@ -73,15 +73,7 @@
 
 struct Node
 {
-  bool EN = false;
-  char *titlePic = "/blank.png";
-  char *titlePic_Hover = "/blank.png";
-  String title_1st;
-  String title_2nd;
-  uint16_t title1stColor = WHITE;
-  uint16_t title2ndColor = WHITE;
-  uint8_t titleSize = 2;
-  uint8_t type; // 2 : Fan, 1 : Air, 0 : Light
+  
 };
 
 class UI
@@ -93,7 +85,7 @@ public:
   void setBrightness(uint8_t brightness);
   void main();
 // Button API
-#define DEBOUNCE_MS 10
+#define DEBOUNCE_MS 30
   Button BtnA = Button(BUTTON_A_PIN, true, DEBOUNCE_MS);
   Button BtnB = Button(BUTTON_B_PIN, true, DEBOUNCE_MS);
   Button BtnC = Button(BUTTON_C_PIN, true, DEBOUNCE_MS);
@@ -133,6 +125,7 @@ private:
 hw_timer_t *timer = NULL;
 //custom RGB565
 #define AQUA 0x4B1D
+#define MITAKA 0xFC00
 //
 #define MAIN 0
 #define STAT 1
@@ -140,21 +133,16 @@ hw_timer_t *timer = NULL;
 #define SETT 3
 #define AIRCONT 10
 #define RETURN_MS 1000
-#define POS_RETURN_MS 600
-#define AC_RETURN_MS 600
+  //
 
   //
   uint8_t panel = 0;
   uint8_t sub_panel = 0;
   //
-  unsigned long long time, counter, return_c, return_ac;
   bool isInited;
-  uint8_t idealRefreshRate = 60;
-  uint8_t refreshRate = 60;
-  uint8_t period; // 1000/refreshRate miliseconds per frame
   uint16_t backgroundColor = BLACK;
-  int fps = 0;
   bool refill = false;
+  bool hold = false, hold2 = false;
   //
   String wifi_ssid, mqtt_ip, wifi_status, mqtt_status;
   String last_wifi_ssid, last_mqtt_ip, last_wifi_status, last_mqtt_status;
@@ -169,6 +157,15 @@ hw_timer_t *timer = NULL;
   int8_t temp_data[32];
   int8_t last_temp_data[32];
   uint8_t last_data[32];
+  bool EN[32]; //false
+  String title_1st[32];
+  String title_2nd[32];
+  uint16_t title1stColor[32]; //WHITE
+  uint16_t title2ndColor[32]; //WHITE
+  uint8_t titleSize[32]; //2
+  uint8_t type[32];      // 2 : Fan, 1 : Air, 0 : Light
+  char *titlePic[32];
+  char *titlePic_Hover[32];
   //
   struct Menu
   {
@@ -207,9 +204,9 @@ hw_timer_t *timer = NULL;
     uint16_t fillColor = LIGHTGREY;
     uint16_t lineColor = WHITE;
     uint16_t selLineColor = WHITE;
-    uint16_t selFillColor = AQUA;
+    uint16_t selFillColor = MITAKA;
     uint16_t titleColor = WHITE;
-    uint8_t titleSize = 3;
+    uint8_t titleSize = 2;
     uint8_t select = 0b100;
     uint8_t lastSel = 0b000;
     String title = "Main Menu";
@@ -222,9 +219,9 @@ hw_timer_t *timer = NULL;
     uint16_t fillColor = LIGHTGREY;
     uint16_t lineColor = WHITE;
     uint16_t selLineColor = WHITE;
-    uint16_t selFillColor = AQUA;
+    uint16_t selFillColor = MITAKA;
     uint16_t titleColor = WHITE;
-    uint8_t titleSize = 3;
+    uint8_t titleSize = 2;
     String title = "Status";
   };
   Stat_panel sa_panel;
@@ -238,9 +235,9 @@ hw_timer_t *timer = NULL;
     uint16_t fillColor = BLACK;
     uint16_t lineColor = WHITE;
     uint16_t selLineColor = WHITE;
-    uint16_t selFillColor = AQUA;
+    uint16_t selFillColor = MITAKA;
     uint16_t titleColor = WHITE;
-    uint8_t titleSize = 3;
+    uint8_t titleSize = 2;
     String title = "Control";
     String up = " +";
     String down = " -";
@@ -253,9 +250,9 @@ hw_timer_t *timer = NULL;
     uint16_t fillColor = LIGHTGREY;
     uint16_t lineColor = WHITE;
     uint16_t selLineColor = WHITE;
-    uint16_t selFillColor = AQUA;
+    uint16_t selFillColor = MITAKA;
     uint16_t titleColor = WHITE;
-    uint8_t titleSize = 3;
+    uint8_t titleSize = 2;
     uint8_t select = 0b100;
     uint8_t lastSel = 0b000;
     String title = "Settings";
