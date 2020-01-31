@@ -1,6 +1,6 @@
 ***Stable Build Version1 Build1 1/02/63***
  - Setting updates
- - Descripions Covered All
+ - Descriptions Covered All
  - No More Frequently Resets For Some Used To Be Boards
 
 
