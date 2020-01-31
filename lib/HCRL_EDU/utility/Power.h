@@ -6,8 +6,8 @@
  * https://www.gnu.org/licenses/old-licenses/lgpl-2.1.en.html           *
  *----------------------------------------------------------------------*/
 #ifndef Power_h
-  #define Power_h
-  #include <Arduino.h>
+#define Power_h
+#include <Arduino.h>
 #include <Wire.h>
 #include "utility/CommUtil.h"
 
@@ -69,5 +69,5 @@ public:
 
 private:
   uint8_t _wakeupPin;
-  };
+};
 #endif

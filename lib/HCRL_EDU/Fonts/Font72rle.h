@@ -7,4 +7,4 @@
 #define firstchr_f72 32
 
 extern const unsigned char widtbl_f72[96];
-extern const unsigned char* const chrtbl_f72[96];
+extern const unsigned char *const chrtbl_f72[96];

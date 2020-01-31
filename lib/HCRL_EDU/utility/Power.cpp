@@ -21,7 +21,7 @@
 #define IP5306_REG_READ3 (0x78)
 #define IP5306_REG_CHG_CTL0 (0x20)
 #define IP5306_REG_CHG_CTL1 (0x21)
-#define IP5306_REG_CHG_DIG  (0x24)
+#define IP5306_REG_CHG_DIG (0x24)
 
 //- REG_CTL0
 #define BOOST_ENABLE_BIT (0x20)
@@ -41,7 +41,7 @@
 #define SHUTDOWNTIME_64S (0x0c)
 #define SHUTDOWNTIME_32S (0x04)
 #define SHUTDOWNTIME_16S (0x08)
-#define SHUTDOWNTIME_8S  (0x00)
+#define SHUTDOWNTIME_8S (0x00)
 
 //- REG_READ0
 #define CHARGE_ENABLE_BIT (0x08)
@@ -54,84 +54,98 @@
 #define LOWPOWER_SHUTDOWN_BIT (0x01)
 
 //- CHG
-#define CURRENT_100MA  (0x01 << 0)
-#define CURRENT_200MA  (0x01 << 1)
-#define CURRENT_400MA  (0x01 << 2)
-#define CURRENT_800MA  (0x01 << 3)
-#define CURRENT_1600MA  (0x01 << 4)
+#define CURRENT_100MA (0x01 << 0)
+#define CURRENT_200MA (0x01 << 1)
+#define CURRENT_400MA (0x01 << 2)
+#define CURRENT_800MA (0x01 << 3)
+#define CURRENT_1600MA (0x01 << 4)
 
-#define BAT_4_2V      (0x00)
-#define BAT_4_3V      (0x01)
-#define BAT_4_3_5V    (0x02)
-#define BAT_4_4V      (0x03)
+#define BAT_4_2V (0x00)
+#define BAT_4_3V (0x01)
+#define BAT_4_3_5V (0x02)
+#define BAT_4_4V (0x03)
 
-#define CHG_CC_BIT    (0x20)
+#define CHG_CC_BIT (0x20)
 
-
-POWER::POWER() {
+POWER::POWER()
+{
 }
 
-void POWER::begin() {
+void POWER::begin()
+{
   uint8_t data;
-  
-  //Initial I2C 
+
+  //Initial I2C
   Wire.begin(21, 22);
-  // 650ma 
+  // 650ma
   setVinMaxCurrent(CURRENT_400MA | CURRENT_200MA);
 
   setChargeVolt(BAT_4_2V);
-  
+
   // End charge current 200ma
-  if(I2C.readByte(IP5306_ADDR, 0x21, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, 0x21, &data) == true)
+  {
     I2C.writeByte(IP5306_ADDR, 0x21, (data & 0x3f) | 0x00);
   }
 
   // Add volt 28mv
-  if(I2C.readByte(IP5306_ADDR, 0x22, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, 0x22, &data) == true)
+  {
     I2C.writeByte(IP5306_ADDR, 0x22, (data & 0xfc) | 0x02);
   }
 
   // Vin charge CC
-  if(I2C.readByte(IP5306_ADDR, 0x23, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, 0x23, &data) == true)
+  {
     I2C.writeByte(IP5306_ADDR, 0x23, (data & 0xdf) | 0x20);
   }
 }
 
-bool POWER::setPowerBoostOnOff(bool en) {
+bool POWER::setPowerBoostOnOff(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true)
+  {
     return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, en ? (data | BOOST_SET_BIT) : (data & (~BOOST_SET_BIT)));
   }
   return false;
 }
 
-bool POWER::setPowerBoostSet(bool en) {
+bool POWER::setPowerBoostSet(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true)
+  {
     return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, en ? (data | SHORT_BOOST_BIT) : (data & (~SHORT_BOOST_BIT)));
   }
   return false;
 }
 
-bool POWER::setPowerVin(bool en) {
+bool POWER::setPowerVin(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true)
+  {
     return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, en ? (data | VIN_ENABLE_BIT) : (data & (~VIN_ENABLE_BIT)));
   }
   return false;
 }
 
-bool POWER::setPowerWLEDSet(bool en) {
+bool POWER::setPowerWLEDSet(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true) {
-      return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, en ? (data | WLED_SET_BIT) : (data & (~WLED_SET_BIT)));
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, &data) == true)
+  {
+    return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL1, en ? (data | WLED_SET_BIT) : (data & (~WLED_SET_BIT)));
   }
   return false;
 }
 
-bool POWER::setPowerBtnEn(bool en) {
+bool POWER::setPowerBtnEn(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true)
+  {
     return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, en ? (data | BOOST_BUTTON_EN_BIT) : (data & (~BOOST_BUTTON_EN_BIT)));
   }
   return false;
@@ -141,23 +155,25 @@ bool POWER::setLowPowerShutdownTime(ShutdownTime time)
 {
   uint8_t data;
   bool ret;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, &data) == true){
-    switch (time){
-      case ShutdownTime::SHUTDOWN_8S:
-        ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_8S));
-        break;
-      case ShutdownTime::SHUTDOWN_16S:
-        ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_16S));
-        break;
-      case ShutdownTime::SHUTDOWN_32S:
-        ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_32S));
-        break;
-      case ShutdownTime::SHUTDOWN_64S:
-        ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_64S));
-        break;
-      default:
-        ret = false;
-        break;
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, &data) == true)
+  {
+    switch (time)
+    {
+    case ShutdownTime::SHUTDOWN_8S:
+      ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_8S));
+      break;
+    case ShutdownTime::SHUTDOWN_16S:
+      ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_16S));
+      break;
+    case ShutdownTime::SHUTDOWN_32S:
+      ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_32S));
+      break;
+    case ShutdownTime::SHUTDOWN_64S:
+      ret = I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL2, ((data & (~SHUTDOWNTIME_MASK)) | SHUTDOWNTIME_64S));
+      break;
+    default:
+      ret = false;
+      break;
     }
     return ret;
   }
@@ -181,10 +197,12 @@ bool POWER::setKeepLightLoad(bool en)
 }
 
 // true: Output normally open
-bool POWER::setPowerBoostKeepOn(bool en) {
+bool POWER::setPowerBoostKeepOn(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true) {
-    return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, en ? (data | BOOST_OUT_BIT)  : (data & (~BOOST_OUT_BIT)));
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true)
+  {
+    return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, en ? (data | BOOST_OUT_BIT) : (data & (~BOOST_OUT_BIT)));
   }
   return false;
 }
@@ -205,95 +223,113 @@ bool POWER::setLowPowerShutdown(bool en)
   default: true
   true: If enough load is connected, the power will turn on.
 */
-bool POWER::setAutoBootOnLoad(bool en) {
+bool POWER::setAutoBootOnLoad(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true)
+  {
     return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, en ? (data | BOOT_ON_LOAD_BIT) : (data & (~BOOT_ON_LOAD_BIT)));
   }
   return false;
 }
 
-bool POWER::setVinMaxCurrent(uint8_t cur) {
+bool POWER::setVinMaxCurrent(uint8_t cur)
+{
   uint8_t data;
-  if(I2C.readByte(IP5306_ADDR, IP5306_REG_CHG_DIG, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_CHG_DIG, &data) == true)
+  {
     return I2C.writeByte(IP5306_ADDR, IP5306_REG_CHG_DIG, (data & 0xe0) | cur);
   }
   return false;
 }
 
-bool POWER::setChargeVolt(uint8_t volt) {
+bool POWER::setChargeVolt(uint8_t volt)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_CHG_CTL0, &data) == true) {
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_CHG_CTL0, &data) == true)
+  {
     return I2C.writeByte(IP5306_ADDR, IP5306_REG_CHG_CTL0, (data & 0xfc) | volt);
   }
   return false;
 }
 
 // if charge full,try set charge enable->disable->enable,can be recharged
-bool POWER::setCharge(bool en) {
+bool POWER::setCharge(bool en)
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true) {
-      return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, en ? (data | CHARGE_OUT_BIT) : (data & (~CHARGE_OUT_BIT)));
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, &data) == true)
+  {
+    return I2C.writeByte(IP5306_ADDR, IP5306_REG_SYS_CTL0, en ? (data | CHARGE_OUT_BIT) : (data & (~CHARGE_OUT_BIT)));
   }
   return false;
 }
 
 // full return true, else return false
-bool POWER::isChargeFull() {
+bool POWER::isChargeFull()
+{
   uint8_t data;
   return (I2C.readByte(IP5306_ADDR, IP5306_REG_READ1, &data))
-         ? (data & CHARGE_FULL_BIT)
-         : false;
+             ? (data & CHARGE_FULL_BIT)
+             : false;
 }
 
 // test if ip5306 is an i2c version
-bool POWER::canControl() {
+bool POWER::canControl()
+{
   return I2C.writeCommand(IP5306_ADDR, IP5306_REG_READ0);
 }
 
 //true:charge, false:discharge
-bool POWER::isCharging() {
+bool POWER::isCharging()
+{
   uint8_t data;
   return (I2C.readByte(IP5306_ADDR, IP5306_REG_READ0, &data))
-         ? (data & CHARGE_ENABLE_BIT)
-         : false;
+             ? (data & CHARGE_ENABLE_BIT)
+             : false;
 }
 
 // Return percentage * 100
-int8_t POWER::getBatteryLevel() {
+int8_t POWER::getBatteryLevel()
+{
   uint8_t data;
-  if (I2C.readByte(IP5306_ADDR, IP5306_REG_READ3, &data) == true) {
-    switch (data & 0xF0) {
-      case 0x00:
-        return 100;
-      case 0x80:
-        return 75;
-      case 0xC0:
-        return 50;
-      case 0xE0:
-        return 25;
-      default:
-        return 0;
+  if (I2C.readByte(IP5306_ADDR, IP5306_REG_READ3, &data) == true)
+  {
+    switch (data & 0xF0)
+    {
+    case 0x00:
+      return 100;
+    case 0x80:
+      return 75;
+    case 0xC0:
+      return 50;
+    case 0xE0:
+      return 25;
+    default:
+      return 0;
     }
   }
   return -1;
 }
 
-void POWER::setWakeupButton(uint8_t button) {
+void POWER::setWakeupButton(uint8_t button)
+{
   _wakeupPin = button;
 }
 
-void POWER::reset() {
+void POWER::reset()
+{
   esp_restart();
 }
 
-bool POWER::isResetbySoftware() {
+bool POWER::isResetbySoftware()
+{
   RESET_REASON reset_reason = rtc_get_reset_reason(0);
   return (reset_reason == SW_RESET ||
           reset_reason == SW_CPU_RESET);
 }
 
-bool POWER::isResetbyWatchdog() {
+bool POWER::isResetbyWatchdog()
+{
   RESET_REASON reset_reason = rtc_get_reset_reason(0);
   return (reset_reason == TG0WDT_SYS_RESET ||
           reset_reason == TG1WDT_SYS_RESET ||
@@ -304,12 +340,14 @@ bool POWER::isResetbyWatchdog() {
           reset_reason == TGWDT_CPU_RESET);
 }
 
-bool POWER::isResetbyDeepsleep() {
+bool POWER::isResetbyDeepsleep()
+{
   RESET_REASON reset_reason = rtc_get_reset_reason(0);
   return (reset_reason == DEEPSLEEP_RESET);
 }
 
-bool POWER::isResetbyPowerSW() {
+bool POWER::isResetbyPowerSW()
+{
   RESET_REASON reset_reason = rtc_get_reset_reason(0);
   return (reset_reason == POWERON_RESET);
 }
