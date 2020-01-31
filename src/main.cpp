@@ -324,30 +324,31 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
     Paylaod[Length] = '\0';
     String topic_str = Topic, payload_str = (char *)Paylaod;
     Serial.print("[" + topic_str + "]: " + payload_str);
+
     if (topic_str.equals(SUB_LIGHT_1))
     {
         SubLight(Paylaod, Length, &light_1Status, light_1RGB, LIGHT_1_INDEX);
-        Serial.printf(" Successfully set %d %d %d\n", light_1RGB[0], light_1RGB[1], light_1RGB[2]);
+        //Serial.printf(" Successfully set %d %d %d\n", light_1RGB[0], light_1RGB[1], light_1RGB[2]);
     }
     else if (topic_str.equals(SUB_LIGHT_2))
     {
         SubLight(Paylaod, Length, &light_2Status, light_2RGB, LIGHT_2_INDEX);
-        Serial.printf(" Successfully set %d %d %d\n", light_2RGB[0], light_2RGB[1], light_2RGB[2]);
+        //Serial.printf(" Successfully set %d %d %d\n", light_2RGB[0], light_2RGB[1], light_2RGB[2]);
     }
     else if (topic_str.equals(SUB_LIGHT_3))
     {
         SubLight(Paylaod, Length, &light_3Status, light_3RGB, LIGHT_3_INDEX);
-        Serial.printf(" Successfully set %d %d %d\n", light_3RGB[0], light_3RGB[1], light_3RGB[2]);
+        //Serial.printf(" Successfully set %d %d %d\n", light_3RGB[0], light_3RGB[1], light_3RGB[2]);
     }
     else if (topic_str.equals(SUB_AIR))
     {
         SubAir(Paylaod, Length);
-        Serial.println("");
+        //Serial.println("");
     }
     else if (topic_str.equals(SUB_FAN))
     {
         SubFan(Paylaod, Length);
-        Serial.println("");
+        //Serial.println("");
     }
 }
 
@@ -361,12 +362,20 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length)
 */
 void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t *lightRGB, uint8_t lightIndex)
 {
+    /*
+        deserialize byte payload to arduinoJSON 
+        and get value from specification key 
+    */
     StaticJsonDocument<1024> doc;
     deserializeJson(doc, payload, length);
     *lightStatus = doc[KEY_STATUS];
     lightRGB[0] = doc[KEY_R];
     lightRGB[1] = doc[KEY_G];
     lightRGB[2] = doc[KEY_B];
+
+    /*
+        set data in UI with data and UI index 
+    */
     hcrl.Ui.set_node_data(lightIndex, *lightStatus);
 }
 
@@ -378,16 +387,20 @@ void SubLight(byte *payload, unsigned int length, uint8_t *lightStatus, uint16_t
 */
 void SubAir(byte *payload, unsigned int length)
 {
+    /*
+        deserialize byte payload to arduinoJSON 
+        and get value from specification key 
+    */
     StaticJsonDocument<1024> doc;
     deserializeJson(doc, payload, length);
 
     airStatus = doc[KEY_STATUS];
     data[1] = airStatus;
-    hcrl.Ui.set_node_data(1, airStatus);
-
     airTemp = doc[KEY_TEMP];
     data[5] = airTemp;
-    hcrl.Ui.set_node_temp(1, airTemp);
+
+    hcrl.Ui.set_node_data(AIR_INDEX, airStatus);
+    hcrl.Ui.set_node_temp(AIR_INDEX, airTemp);
 }
 
 /*
@@ -398,11 +411,28 @@ void SubAir(byte *payload, unsigned int length)
 */
 void SubFan(byte *payload, unsigned int length)
 {
+    /*
+        deserialize byte payload to arduinoJSON 
+        and get value from specification key 
+    */
     StaticJsonDocument<1024> doc;
     deserializeJson(doc, payload, length);
     fanStatus = doc[KEY_STATUS];
     fanLevel = doc[KEY_LEVEL];
-    hcrl.Ui.set_node_data(0, fanStatus);
+
+    hcrl.Ui.set_node_data(FAN_INDEX, fanStatus);
+}
+
+void SUbStrip(byte *payload, unsigned int length)
+{
+
+    StaticJsonDocument<1024> doc;
+    deserializeJson(doc, payload, length);
+    rgbStripStatus = doc[KEY_STATUS];
+    /*
+        insert set method here
+    
+    */
 }
 
 /*
@@ -414,6 +444,10 @@ void SubFan(byte *payload, unsigned int length)
 */
 void PubENV(const char *topic)
 {
+    /*
+       seriallize data to string and send to mqtt broker
+        
+    */
     size_t size = 1024;
     DynamicJsonDocument docJson(size);
     char json[1024];
@@ -421,6 +455,7 @@ void PubENV(const char *topic)
     docJson[KEY_HUMI] = humi;
     docJson[KEY_PRESSURE] = pressure;
     serializeJson(docJson, json);
+
     //Sprintln(String(topic) + " : " + String(json));
     hcrl.MQTT.publish(topic, json);
 }
@@ -432,6 +467,10 @@ void PubENV(const char *topic)
 */
 void PubMOTION(const char *topic)
 {
+    /*
+       seriallize data to string and send to mqtt broker
+        
+    */
     size_t size = 1024;
     DynamicJsonDocument docJson(size);
     char json[1024];
@@ -448,6 +487,10 @@ void PubMOTION(const char *topic)
 */
 void PubLight(const char *topic, uint8_t lightStatus)
 {
+    /*
+       seriallize data to string and send to mqtt broker
+        
+    */
     size_t size = 1024;
     DynamicJsonDocument docJson(size);
     char json[1024];
@@ -465,6 +508,10 @@ void PubLight(const char *topic, uint8_t lightStatus)
 */
 void PubAir(const char *topic)
 {
+    /*
+       seriallize data to string and send to mqtt broker
+        
+    */
     size_t size = 1024;
     DynamicJsonDocument docJson(size);
     char json[1024];
@@ -483,6 +530,10 @@ void PubAir(const char *topic)
 */
 void PubFan(const char *topic)
 {
+    /*
+       seriallize data to string and send to mqtt broker
+        
+    */
     size_t size = 1024;
     DynamicJsonDocument docJson(size);
     char json[1024];
@@ -495,21 +546,14 @@ void PubFan(const char *topic)
 
 void PubStrip(const char *topic)
 {
+    /*
+       seriallize data to string and send to mqtt broker
+        
+    */
     size_t size = 1024;
     DynamicJsonDocument docJson(size);
     char json[1024];
     docJson[KEY_STATUS] = RGB_Strip;
     serializeJson(docJson, json);
     hcrl.MQTT.publish(topic, json);
-}
-
-void SUbStrip(byte *payload, unsigned int length)
-{
-    StaticJsonDocument<1024> doc;
-    deserializeJson(doc, payload, length);
-    rgbStripStatus = doc[KEY_STATUS];
-    /*
-        insert set method here
-    
-    */
 }
