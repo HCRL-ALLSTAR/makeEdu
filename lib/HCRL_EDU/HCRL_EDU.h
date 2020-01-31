@@ -61,7 +61,9 @@ HCRL_EDU::~HCRL_EDU()
 void HCRL_EDU::update()
 {
     STRIP.update();
+    STRIP.setBrightness(Ui.get_stripBrightness());
     LED.update();
+    LED.setBrightness(Ui.get_ledBrightness());
     MQTT.update();
     Ui.set_wifi_ssid(WiFi.getSSID());
     Ui.set_wifi_status(WiFi.getStatus());

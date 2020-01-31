@@ -48,6 +48,7 @@
 #if defined(ESP32)
 
 #include <Arduino.h>
+#include <esp_system.h>
 #include <Wire.h>
 #include <SPI.h>
 #include "FS.h"
@@ -59,10 +60,7 @@
 #include "utility/Battery.h"
 #include "utility/Power.h"
 #include "utility/CommUtil.h"
-
 #include "Free_Fonts.h"
-
-#include <esp_system.h>
 
 #define MAX_NODE 32
 #define MAX_SUB 32
@@ -114,21 +112,24 @@ public:
   void set_pa(float pressure);
   void set_motion(int motion);
 
+  uint16_t get_stripBrightness() { return strip_brightness; }
+  uint16_t get_ledBrightness() { return led_brightness; }
+
 private:
   //watchdog
   hw_timer_t *timer = NULL;
-//custom RGB565
-#define AQUA 0x4B1D
-#define MITAKA 0xFC00
-//
-#define MAIN 0
-#define STAT 1
-#define CONT 2
-#define SETT 3
-#define AIRCONT 10
-#define RETURN_MS 1000
+  //custom RGB565
+  #define AQUA 0x4B1D
+  #define MITAKA 0xFC00
   //
-
+  #define MAIN 0
+  #define STAT 1
+  #define CONT 2
+  #define SETT 3
+  #define AIRCONT 10
+  #define RETURN_MS 1000
+  //
+  uint16_t strip_brightness = 10,led_brightness = 10;
   //
   uint8_t panel = 0;
   uint8_t sub_panel = 0;
@@ -238,7 +239,7 @@ private:
   //
   struct Sett_panel
   {
-    uint16_t fillColor = LIGHTGREY;
+    uint16_t fillColor = WHITE;
     uint16_t lineColor = WHITE;
     uint16_t selLineColor = WHITE;
     uint16_t selFillColor = MITAKA;
@@ -248,7 +249,8 @@ private:
     uint8_t lastSel = 0b000;
     String title = "Settings";
     bool change = true;
-    uint8_t st_data[3] = {2, 0, 0};
+    bool change2 = true;
+    uint8_t st_data[3] = {2, 1, 1};
   };
   Sett_panel st_panel;
   void sett_panel();
