@@ -1,13 +1,14 @@
 #include <Arduino.h>
 #include "HCRL_EDU.h"
 
+//define M5 Publish Topic
 #define PUB_LIGHT_1 "M5/light1"
 #define PUB_LIGHT_2 "M5/light2"
 #define PUB_LIGHT_3 "M5/light3"
 #define PUB_AIR "M5/air"
 #define PUB_FAN "M5/fan"
 #define PUB_ENV "M5/env"
-#define PUB_PIR "M5/pir"
+#define PUB_MOTION "M5/motion"
 #define PUB_STRIP "M5/Strip"
 
 #define SUB_LIGHT_1 "Node/light1"
@@ -41,7 +42,7 @@ void SubFan(byte *payload, unsigned int length);
 void SUbStrip(byte *payload, unsigned int length);
 
 void PubENV(const char *topic);
-void PubPIR(const char *topic);
+void PubMOTION(const char *topic);
 void PubLight(const char *topic, uint8_t lightStatu);
 void PubAir(const char *topic);
 void PubFan(const char *topic);
@@ -79,6 +80,9 @@ HCRL_EDU hcrl;
 #define LIGHT_2_INDEX 3
 #define LIGHT_3_INDEX 4
 
+/*
+    last variable data store 
+*/
 int data[7] = {0, 0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp , 6-rgb_strip
 
 void setup()
@@ -198,7 +202,7 @@ void loop()
             data[0] = fanLevel;
             PubFan(PUB_FAN);
         }
-        PubPIR(PUB_PIR);
+        PubMOTION(PUB_MOTION);
         if (data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
         {
             data[2] = light_1Status;
@@ -332,7 +336,7 @@ void PubENV(const char *topic)
     "st": boolean	--> Current Value of Motion Sensor
 }
 */
-void PubPIR(const char *topic)
+void PubMOTION(const char *topic)
 {
     size_t size = 1024;
     DynamicJsonDocument docJson(size);
