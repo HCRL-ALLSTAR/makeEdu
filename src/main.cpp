@@ -17,6 +17,15 @@
 #define SUB_FAN "Node/fan"
 #define SUB_STRIP "Node/Strip"
 
+#define AIR_GREEN_ICON_PATH "/AIR/Air_GREEN.png"
+#define AIR_GREEN_HOVER_ICON_PATH "/AIR/Air_GREEN_Hover.png"
+#define AIR_RED_ICON_PATH "/AIR/Air_RED.png"
+#define AIR_RED_HOVER_ICON_PATH "/AIR/Air_RED_Hover.png"
+#define FAN_ICON_PATH "/FAN/Fan_BLUE.png"
+#define FAN_HOVER_ICON_PATH "/FAN/Fan_BLUE_Hover.png"
+#define LIGHT_ICON_PATH "/LIGHT/Li_YELLOW.png"
+#define LIGHT_HOVER_ICON_PATH "/LIGHT/Li_YELLOW_Hover.png"
+
 #define KEY_TEMP "temp"
 #define KEY_HUMI "humi"
 #define KEY_PRESSURE "pres"
@@ -75,7 +84,7 @@ int data[7] = {0, 0, 0, 0, 0, 0, 0}; //0-fan , 1-air , 2-4-light , 5-temp , 6-rg
 void setup()
 {
     Serial.begin(115200);
-    
+
     // hcrl.WiFi.begin("WIFIIV", "0245760494");
     // hcrl.MQTT.begin("192.168.1.127", HCRL_MQTT_PORT, callback);
 
@@ -99,30 +108,30 @@ void setup()
         char buffer[50];
         sprintf(buffer, "Item %d", i);
         hcrl.Ui.node_setTitle(i, (String)buffer, "abcdefghijkl");
-        hcrl.Ui.node_setTitlePic(i, "/AIR/Air_GREEN.png", "/AIR/Air_GREEN_Hover.png");
+        hcrl.Ui.node_setTitlePic(i, AIR_RED_ICON_PATH, AIR_GREEN_HOVER_ICON_PATH);
     }
 
     hcrl.Ui.node_setAllTitleColor(WHITE, CYAN);
 
     hcrl.Ui.node_setType(FAN_INDEX, FAN);
     hcrl.Ui.node_setTitle(FAN_INDEX, "Fan", "Near Door");
-    hcrl.Ui.node_setTitlePic(FAN_INDEX, "/FAN/Fan_BLUE.png", "/FAN/Fan_BLUE_Hover.png");
+    hcrl.Ui.node_setTitlePic(FAN_INDEX, FAN_ICON_PATH, FAN_HOVER_ICON_PATH);
 
     hcrl.Ui.node_setType(AIR_INDEX, AIR);
     hcrl.Ui.node_setTitle(AIR_INDEX, "Air", " ");
-    hcrl.Ui.node_setTitlePic(AIR_INDEX, "/AIR/Air_RED.png", "/AIR/Air_RED_Hover.png");
+    hcrl.Ui.node_setTitlePic(AIR_INDEX, AIR_RED_ICON_PATH, AIR_RED_HOVER_ICON_PATH);
 
     hcrl.Ui.node_setType(LIGHT_1_INDEX, LIGHT);
     hcrl.Ui.node_setTitle(LIGHT_1_INDEX, "LIGHT", "1");
-    hcrl.Ui.node_setTitlePic(LIGHT_1_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+    hcrl.Ui.node_setTitlePic(LIGHT_1_INDEX, LIGHT_ICON_PATH, LIGHT_HOVER_ICON_PATH);
 
     hcrl.Ui.node_setType(LIGHT_2_INDEX, LIGHT);
     hcrl.Ui.node_setTitle(LIGHT_2_INDEX, "LIGHT", "2");
-    hcrl.Ui.node_setTitlePic(LIGHT_2_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+    hcrl.Ui.node_setTitlePic(LIGHT_2_INDEX, LIGHT_ICON_PATH, LIGHT_HOVER_ICON_PATH);
 
     hcrl.Ui.node_setType(LIGHT_3_INDEX, LIGHT);
     hcrl.Ui.node_setTitle(LIGHT_3_INDEX, "LIGHT", "3");
-    hcrl.Ui.node_setTitlePic(LIGHT_3_INDEX, "/LIGHT/Li_YELLOW.png", "/LIGHT/Li_YELLOW_Hover.png");
+    hcrl.Ui.node_setTitlePic(LIGHT_3_INDEX, LIGHT_ICON_PATH, LIGHT_HOVER_ICON_PATH);
 
     pubDelay.start(Sec2MS(3));
     hcrl.ANGLE.begin();
@@ -405,5 +414,4 @@ void SUbStrip(byte *payload, unsigned int length)
         insert set method here
     
     */
-    
 }
