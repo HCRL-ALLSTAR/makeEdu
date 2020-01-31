@@ -423,18 +423,6 @@ void SubFan(byte *payload, unsigned int length)
     hcrl.Ui.set_node_data(FAN_INDEX, fanStatus);
 }
 
-void SUbStrip(byte *payload, unsigned int length)
-{
-
-    StaticJsonDocument<1024> doc;
-    deserializeJson(doc, payload, length);
-    rgbStripStatus = doc[KEY_STATUS];
-    /*
-        insert set method here
-    
-    */
-}
-
 /*
 {
     "temp": number,		--> Current Temperature
