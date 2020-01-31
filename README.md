@@ -9,7 +9,7 @@
  - Brightness Test
 
 
-**_Stable Build Beta1 31/01/63 1.15AM_**
+***Stable Build Beta1 31/01/63***
 
 - Core Panic Fixed
 - Performance Upgrades
