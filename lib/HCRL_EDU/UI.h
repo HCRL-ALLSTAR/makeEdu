@@ -117,16 +117,16 @@ public:
 private:
   //watchdog
   hw_timer_t *timer = NULL;
-  //custom RGB565
-  #define AQUA 0x4B1D
-  #define MITAKA 0xFC00
-  //
-  #define MAIN 0
-  #define STAT 1
-  #define CONT 2
-  #define SETT 3
-  #define AIRCONT 10
-  #define RETURN_MS 1000
+//custom RGB565
+#define AQUA 0x4B1D
+#define MITAKA 0xFC00
+//
+#define MAIN 0
+#define STAT 1
+#define CONT 2
+#define SETT 3
+#define AIRCONT 10
+#define RETURN_MS 1000
   //
 
   //
@@ -156,8 +156,8 @@ private:
   String title_2nd[32];
   uint16_t title1stColor[32]; //WHITE
   uint16_t title2ndColor[32]; //WHITE
-  uint8_t titleSize[32]; //2
-  uint8_t type[32];      // 2 : Fan, 1 : Air, 0 : Light
+  uint8_t titleSize[32];      //2
+  uint8_t type[32];           // 2 : Fan, 1 : Air, 0 : Light
   char *titlePic[32];
   char *titlePic_Hover[32];
   //
@@ -248,7 +248,7 @@ private:
     uint8_t lastSel = 0b000;
     String title = "Settings";
     bool change = true;
-    uint8_t st_data[3] ={0,0,0};
+    uint8_t st_data[3] = {2, 0, 0};
   };
   Sett_panel st_panel;
   void sett_panel();
