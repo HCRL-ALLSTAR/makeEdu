@@ -303,7 +303,6 @@ void loop()
         if (data[6] != RGB_Strip)
         {
             data[6] = RGB_Strip;
-            PubStrip(PUB_STRIP);
         }
 
         /*
