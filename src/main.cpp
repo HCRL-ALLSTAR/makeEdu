@@ -276,35 +276,33 @@ void loop()
         M5 Publish Zone 
         check if data is changed will publish to mqtt server 
     */
+
+    if (data[1] != airStatus || data[5] != airTemp)
+    {
+        data[1] = airStatus;
+        data[5] = airTemp;
+        PubAir(PUB_AIR);
+    }
+
+    if (data[0] != fanLevel)
+    {
+        data[0] = fanLevel;
+        PubFan(PUB_FAN);
+    }
+    if (data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
+    {
+        data[2] = light_1Status;
+        data[3] = light_2Status;
+        data[4] = light_3Status;
+        PubLight(PUB_LIGHT_1, light_1Status);
+        PubLight(PUB_LIGHT_2, light_2Status);
+        PubLight(PUB_LIGHT_3, light_3Status);
+    }
+
     if (pubDelay.justFinished()) //m5->Node-red
     {
-        if (data[1] != airStatus || data[5] != airTemp)
-        {
-            data[1] = airStatus;
-            data[5] = airTemp;
-            PubAir(PUB_AIR);
-        }
         PubENV(PUB_ENV);
-        if (data[0] != fanLevel)
-        {
-            data[0] = fanLevel;
-            PubFan(PUB_FAN);
-        }
         PubMOTION(PUB_MOTION);
-        if (data[2] != light_1Status || data[3] != light_2Status || data[4] != light_3Status)
-        {
-            data[2] = light_1Status;
-            data[3] = light_2Status;
-            data[4] = light_3Status;
-            PubLight(PUB_LIGHT_1, light_1Status);
-            PubLight(PUB_LIGHT_2, light_2Status);
-            PubLight(PUB_LIGHT_3, light_3Status);
-        }
-        if (data[6] != RGB_Strip)
-        {
-            data[6] = RGB_Strip;
-        }
-
         /*
             repeat pubDelay interval 
         */
