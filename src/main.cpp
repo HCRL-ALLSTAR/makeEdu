@@ -58,7 +58,9 @@ void callback(char *Topic, byte *Paylaod, unsigned int Length);
 float temp;
 float humi;
 float pressure;
+
 uint8_t motionStatus;
+
 uint8_t light_1Status;
 uint8_t light_2Status;
 uint8_t light_3Status;
@@ -189,6 +191,7 @@ void setup()
     /*
         begin env sensor
     */
+
     hcrl.ENV.begin();
 
     /*
@@ -247,15 +250,7 @@ void loop()
 
     RGB_Strip = hcrl.Ui.get_strip_data();
 
-    if (fanLevel > 0) //on
-    {
-        fanStatus = 1;
-    }
-    else if (fanLevel == 0) //off
-    {
-        fanStatus = 0;
-    }
-
+  
     /*
         set RGB strip to fix color 
     */
@@ -276,6 +271,14 @@ void loop()
         M5 Publish Zone 
         check if data is changed will publish to mqtt server 
     */
+    if (fanLevel > 0) //on
+    {
+        fanStatus = 1;
+    }
+    else if (fanLevel == 0) //off
+    {
+        fanStatus = 0;
+    }
 
     if (data[1] != airStatus || data[5] != airTemp)
     {
